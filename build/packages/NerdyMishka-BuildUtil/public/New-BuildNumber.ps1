@@ -2,10 +2,20 @@
 
 function New-BuildNumber() {
     Param(
-        [String] $Format = '$(BUILD.DEFINITIONNAME)_(DATE:yyyyMMdd).{{Rev:rr}}',
+        [String] $Format = $null,
 
         [String] $BuildNumber 
     )
+
+    if([string]::IsNullOrWhiteSpace($Format))
+    {
+        if($ENV:NM_BUILD_NUMBER_FORMAT)
+        {
+            $Format = $ENV:NM_BUILD_NUMBER_FORMAT
+        } else {
+            $Format = '$(Build.DefinitionName)_$(DATE:yyyyMMdd).$(Rev:rr)'
+        }
+    }
 
     # build number is already set
     if($ENV:NM_BUILD_NUMBER)
