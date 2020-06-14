@@ -1,5 +1,5 @@
 
-function Get-GitBranchName()
+function Get-GitBranch()
 {
     Param(
         [Switch] $CurrentOnly 
@@ -18,7 +18,7 @@ function Get-GitBranchName()
         if($line.StartsWith("*"))
         {
             $current = $true;
-            $branchName = $line.SubString(3).Trim()
+            $branchName = $line.SubString(2).Trim()
             if($CurrentOnly)
             {
                 return $branchName
@@ -29,7 +29,7 @@ function Get-GitBranchName()
 
         $set += [PsCustomObject]@{
             "IsCurrent" = $current
-            "BranchName" = $branchName 
+            "Name" = $branchName 
         }
     }
 

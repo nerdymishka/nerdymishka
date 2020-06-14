@@ -8,7 +8,12 @@ function Get-LocalBuildDatabase()
 
     if([string]::IsNullOrWhiteSpace($InputObject))
     {
-        $InputObject = "$HOME/.nerdymishka/build/build.db"
+        if($ENV:NM_BUILD_DB)
+        {
+            $InputObject = $ENV:NM_BUILD_DB 
+        } else {
+            $InputObject = "$HOME/.nerdymishka/build/build.db"
+        }
     }
 
     if(!(Test-Path $InputObject))

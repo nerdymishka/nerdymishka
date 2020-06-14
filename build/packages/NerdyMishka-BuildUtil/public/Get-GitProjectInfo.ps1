@@ -14,20 +14,19 @@ function Get-GitProjectInfo() {
     }
 
     $cfgParts = $Config.Split("/")
-    $Location = $Location.Replace("\\", "/")
+    $Location = $Location.Replace("\", "/")
     if(!$Location.EndsWith($Config))
     {
-        
         if($cfgParts.Length -eq 2)
         {
             if($Location.EndsWith($cfgParts[0]))
             {
                 $Location += "/" + $cfgParts[1];
             } else {
-                $Location += "$($cfgParts[0])/$($cfgParts[1])"
+                $Location += "/$($cfgParts[0])/$($cfgParts[1])"
             }
         } else {
-            $Location += $cfgParts[0]
+            $Location += $Config 
         }
     }
 
@@ -65,7 +64,7 @@ function Get-GitProjectInfo() {
         $next = $false;
         foreach($line in $content)
         {
-            if($line -match "[remote `"$Remote`"]")
+            if($line -match "\[remote \`"$Remote\`"\]")
             {
                 $next = $true;
                 continue;
@@ -74,8 +73,8 @@ function Get-GitProjectInfo() {
             if($next -and ($line -match "url ="))
             {
                 $uri = [Uri]$line.Replace("url =", "").Trim()
-                $segments = $uri.LocalPath.Trim("/")
-                if($uri.Authority -eq "dev.azure.com")
+                $segments = $uri.LocalPath.Trim("/").Split("/")
+                if($uri.Authority -match "dev\.azure\.com")
                 {
                     $org = $segments[0]
                     $team = $segments[1]

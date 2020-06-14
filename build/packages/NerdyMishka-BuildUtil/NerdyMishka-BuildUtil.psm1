@@ -14,7 +14,7 @@ Get-ChildItem "$PsScriptRoot\private\**\*.ps1" | ForEach-Object {
 }
 #>
 
-Get-ChildItem "$PsScriptRoot\public\**\*.ps1" | ForEach-Object {
+Get-ChildItem "$PsScriptRoot\public\*.ps1" | ForEach-Object {
     $functions += $_.Name.Substring(0, $_.Name.Length - 4)
     . "$($_.FullName)"
 }

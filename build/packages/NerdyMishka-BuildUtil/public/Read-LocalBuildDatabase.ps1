@@ -27,9 +27,11 @@ function Read-LocalBuildDatabase()
             return $null;
         }
 
-        if($i -lt $segments.Length)
+        if($i -lt ($segments.Length - 1))
         {
-            if(!($next -is [PsCustomObject]) -and !($next -is [Hashtable]))
+            if(!($next -is [PsCustomObject]) -and `
+              !($next -is [Hashtable]) -and `
+              !($next -is [Array]))
             {
                 return $null 
             }

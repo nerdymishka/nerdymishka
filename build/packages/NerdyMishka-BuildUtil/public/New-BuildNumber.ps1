@@ -39,7 +39,7 @@ function New-BuildNumber() {
 
     $definition = Get-BuildDefinitionName 
     $section = Get-LocalBuildDatabase $defintion 
-    $branch = Get-GitBranch -Current  
+    $branch = Get-GitBranch -CurrentOnly
     $r = 0
     if(!$section)
     {

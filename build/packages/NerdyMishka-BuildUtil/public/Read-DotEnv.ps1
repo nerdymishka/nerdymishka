@@ -3,10 +3,12 @@ function Read-DotEnv()
 {
     [CmdletBinding()]
     param(
+        [Alias("Path")]
+        [Parameter(Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [String] $InputObject 
     )
 
-    if([string]::IsNullOrWhiteSpace($InputObject))
+    if ([string]::IsNullOrWhiteSpace($InputObject))
     {
         $InputObject = $PWD.Path;
         $InputObject += "/.env" 
@@ -14,14 +16,14 @@ function Read-DotEnv()
 
     $originalPath = $InputObject
 
-    While(!(Test-Path $InputObject))
+    While (!(Test-Path $InputObject))
     {
         # pop .env
         $dir = (Split-Path $InputObject -Parent) 
         
         # pop current directory
         $dir = (Split-Path $dir -Parent)
-        if([string]::IsNullOrWhiteSpace($dir))
+        if ([string]::IsNullOrWhiteSpace($dir))
         {
             Write-Debug "Could not locate .env in the path or ancestor folders $($originalPath)"
             return
@@ -36,36 +38,38 @@ function Read-DotEnv()
     $quote = $false 
     $json = $false 
     $name = $null 
-    $sb = new-object System.Text.StringBuilder 
+    $sb = New-Object System.Text.StringBuilder 
     foreach ($line in $content) 
     {
-        if($multiLine)
+        if ($multiLine)
         {
-            if($quote -and (($single -and $line.EndsWith("`'")) -or $line.EndsWith("`"")))
+            if ($quote -and (($single -and $line.EndsWith("`'")) -or $line.EndsWith("`"")))
             {
                 $multiLine = $false;
                 $quote = $false 
                 $n = $line.TrimEnd(); 
-                if($single) 
+                if ($single) 
                 {
                     $single = $false 
                     $n = $n.TrimEnd("'")
-                } else {
+                }
+                else
+                {
                     $n = $n.TrimEnd("`"")
                 }
 
-                $sb.AppendLine($n);
+                $sb.Append($n);
                 Set-BuildVariable -Name $Name -Value ($sb.ToString())
                 $sb.Clear()
                 $Name = $Null 
                 continue;
             }
 
-            if($json -and $line -eq "}")
+            if ($json -and $line -eq "}")
             {
                 $json = $false 
                 $multiLine = $false;
-                $sb.AppendLine($line.TrimEnd(' '));
+                $sb.Append($line);
                 Set-BuildVariable -Name $Name -Value ($sb.ToSTring())
                 $sb.Clear()
                 $Name = $Null 
@@ -76,38 +80,51 @@ function Read-DotEnv()
             continue;
         }
 
-        if([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith("#"))
+        if ([string]::IsNullOrWhiteSpace($line) -or $line.StartsWith("#"))
         {
             continue
         }
 
-        if($line -match "=")
+        if ($line -match "=")
         {
+
             $set = $line.Split("=");
             $name = $set[0].Trim();
-
+     
             # only trim the start in case this is a multiline
             # value. 
-            $v = $set[1].TrimStart(); 
-            $value = $set[1].Trim();
-            if($v[0] -eq "`"")
+            $v = $set[1].TrimStart();
+            if ([string]::IsNullOrWhiteSpace($v))
             {
-                if($v[$v.Length -1] -eq "`"")
+                # setting enviroment variables to an empty string is
+                # transformed into null, so may as well do this
+                # explicitly and continue early. 
+                Set-BuildVariable -Name $name -Value $null
+                continue;
+            }
+            $value = $set[1].Trim();
+            if ($v[0] -eq "`"")
+            {
+                if ($v[$v.Length - 1] -eq "`"")
                 {
                     $value = $v.Replace("\n", [Environment]::NewLine).Trim("`"");
-                } else {
+                }
+                else
+                {
                     $multiLine = $true;
                     $quote = $true;
                     $sb.AppendLine($v.TrimStart("`""));
                 }
             }
 
-            if($v[0] -eq '''')
+            if ($v[0] -eq '''')
             {
-                if($v[$v.Length -1] -eq '''')
+                if ($v[$v.Length - 1] -eq '''')
                 {
                     $value = $v.Trim("'");
-                } else {
+                }
+                else
+                {
                     $multiLine = $true;
                     $quote = $true;
                     $single = $true
@@ -115,18 +132,18 @@ function Read-DotEnv()
                 }
             }
 
-            if($v[0] -eq '{')
+            if ($v[0] -eq '{')
             {
                 $multiLine = $true;
                 $json = $true;
                 $sb.AppendLine($v)
             }
 
-            if($multiLine)
+            if ($multiLine)
             {
-               continue; 
+                continue; 
             }
-
+          
             Set-BuildVariable -Name $name -Value $value 
         }
     }

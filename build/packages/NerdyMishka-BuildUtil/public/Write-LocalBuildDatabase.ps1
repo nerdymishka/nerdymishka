@@ -10,7 +10,12 @@ function Write-LocalBuildDatabase()
 
     if([string]::IsNullOrWhiteSpace($Destination))
     {
-        $Destination = "$HOME/.nerdymishka/build/build.db"
+        if($ENV:NM_BUILD_DB)
+        {
+            $Destination = $ENV:NM_BUILD_DB 
+        } else {
+            $Destination = "$HOME/.nerdymishka/build/build.db"
+        }
     }
 
     if(!(Test-Path $Destination))
@@ -20,11 +25,6 @@ function Write-LocalBuildDatabase()
         {
             New-Item $dir -ItemType Directory 
         }
-    }
-
-    if(!($InputObject -is [String]))
-    {
-        $InputObject = $InputObject | ConvertTo-Json -Depth 15
     }
 
     $lock = "$Destination.lock"
@@ -42,6 +42,10 @@ function Write-LocalBuildDatabase()
     }
 
     "" > "$Destination.lock"
+    if(!($InputObject -is [String]))
+    {
+        $InputObject = $InputObject | ConvertTo-Json -Depth 15
+    }
     [IO.File]::WriteAllText($Destination, $InputObject)
-    Remove-Item $Destination -Force
+    Remove-Item $lock -Force
 }
