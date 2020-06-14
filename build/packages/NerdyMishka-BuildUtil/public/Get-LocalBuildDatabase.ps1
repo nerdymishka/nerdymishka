@@ -2,6 +2,7 @@
 function Get-LocalBuildDatabase()
 {
     Param(
+        [Alias("Path")]
         [Parameter(Position = 0, ValueFromPipeline = $true)]
         [String] $InputObject 
     )

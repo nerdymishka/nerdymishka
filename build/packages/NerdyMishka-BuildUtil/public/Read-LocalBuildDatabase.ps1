@@ -9,7 +9,7 @@ function Read-LocalBuildDatabase()
         [String] $DatabasePath 
     )
 
-    $db = Get-LocalBuildDatabase $DatabasePath
+    $db = Get-LocalBuildDatabase -InputObject $DatabasePath
     if([string]::IsNullOrWhiteSpace($InputObject))
     {
         return $db;
@@ -17,15 +17,18 @@ function Read-LocalBuildDatabase()
 
     $segments = $InputObject.Split("/");
     $target = $db;
-    for($i = 0; $segments.Length; $i++)
+    for($i = 0; $i -lt $segments.Length; $i++)
     {
         $key = $segments[$i];
-        $next = $target[$key]
+        $next = $target.$key 
         
         if($Null -eq $next)
         {
             return $null;
         }
+
+        
+        $target = $next;
 
         if($i -lt ($segments.Length - 1))
         {
@@ -36,7 +39,7 @@ function Read-LocalBuildDatabase()
                 return $null 
             }
 
-            $target = $next;
+            continue;
         }
 
         return $next;

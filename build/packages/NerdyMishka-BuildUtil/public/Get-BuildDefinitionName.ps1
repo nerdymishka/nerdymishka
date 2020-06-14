@@ -5,14 +5,15 @@ function Get-BuildDefinitionName()
         [String] $Location
     )
 
-    if($ENV:BUILD_DEFINITIONNAME) 
+    if($ENV:NM_BUILD_DEFINITIONNAME) 
     {
-        return $ENV:BUILD_DEFINITIONNAME
+        return $ENV:NM_BUILD_DEFINITIONNAME
     }
 
-    if($ENV:NM_BUILD_DEFINITIONAME) 
+    if($ENV:BUILD_DEFINITIONNAME) 
     {
-        return $ENV:NM_BUILD_DEFINITIONAME
+        $ENV:NM_BUILD_DEFINITIONNAME = $ENV:BUILD_DEFINITIONNAME
+        return $ENV:BUILD_DEFINITIONNAME
     }
 
     $info = Get-GitProjectInfo

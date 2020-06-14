@@ -38,17 +38,18 @@ function New-BuildNumber() {
     }
 
     $definition = Get-BuildDefinitionName 
-    $section = Get-LocalBuildDatabase $defintion 
+    $section = Read-LocalBuildDatabase -Query $defintion 
     $branch = Get-GitBranch -CurrentOnly
     $r = 0
     if(!$section)
     {
-        $info = Get-GitProjectName
-        
+        $db = Get-LocalBuildDatabase
         $teamProject = $ENV:SYSTEM_TEAMPROJECT
         if(!$teamProject) { $teamProject = $ENV:NM_PROJECT }
-        if(!$teamProject) { $info.Project }
-
+        if(!$teamProject) { 
+            $info = Get-GitProjectName 
+            $teamProject = $info.project 
+        }
 
         $data = [PsCustomObject]@{
             revision = 0
@@ -60,7 +61,6 @@ function New-BuildNumber() {
         $section | Add-Member -MemberType NoteProperty -Name $definition -Value $data 
     }
     $now = [datetime]::UtcNow
-
     $r = $section.revision
     $buildId = $section.buildId 
     $lastBuild = $section.lastBuild 
@@ -74,16 +74,16 @@ function New-BuildNumber() {
     $buildId = $buildId + 1;
     $section.buildId = $buildId
     $section.revision = $r;
-    $section.lastBuild = $date 
+    $section.lastBuild = $now; 
     $section.sourceBranch = $branch
 
-    $db[$definition] = $section
-
+    $db.$definition = $section
     $db | Write-LocalBuildDatabase
 
     $model = @{
         "Build.DefinitionName" = $definition
-        "TeamProject" = $section.TeamProject
+        "TeamProject" = $section.project
+        "Project" = $section.project 
         "BuildId" = $buildId 
         "Rev" = $r 
         "SourceBranchName" = $branch
