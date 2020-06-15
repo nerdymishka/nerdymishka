@@ -10,14 +10,17 @@ Task "nuget:restore" {
     dotnet restore 
 }
 
-Task "test:unit" -depends "nuget:restore", "build"  {
+Task "test:unit" -depends "nuget:restore", "build" {
     $c = $ENV:MSBUILD_CONFIGURATION
+    $artifactsDir = Get-BuildArtifactsDirectory 
+    $testDir = "$artifactsDir/test-results"
+    
     dotnet test -c $c --filter tag=unit -r "$testDir"
 }
 
 Task "build" -depends  "dotenv", "nuget:restore" 
 
-Task "build:projects"  {
+Task "build:projects" {
     $c = $ENV:MSBUILD_CONFIGURATION
     dotnet build -c $c --no-restore
 }

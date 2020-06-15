@@ -2,7 +2,7 @@ using Xunit.Sdk;
 
 namespace Mettle
 {
-    [XunitTestCaseDiscoverer("Mettle.Xunit.Sdk.TestCaseDiscoverer", "Mettle.Xunit")]
+    [XunitTestCaseDiscoverer("Mettle.Xunit.Sdk.TestCaseDiscoverer", "NerdyMishka.Mettle")]
     public class IntegrationTestAttribute : TestCaseAttribute
     {
         public IntegrationTestAttribute()

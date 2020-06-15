@@ -6,7 +6,7 @@ namespace Mettle
     /// Notates a unit test for the Mettle test runner and annotates the
     /// tag and category traits as 'unit'
     /// </summary>
-    [XunitTestCaseDiscoverer("Mettle.Xunit.Sdk.TestCaseDiscoverer", "Mettle.Xunit")]
+    [XunitTestCaseDiscoverer("Mettle.Xunit.Sdk.TestCaseDiscoverer", "NerdyMishka.Mettle")]
     public class UnitTestAttribute : TestCaseAttribute
     {
         /// <summary>
