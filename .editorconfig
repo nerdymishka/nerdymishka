@@ -1,2 +1,4 @@
 [*.AssemblyInfo.cs]
 generated_code = true
+[*.AssemblyAttributes.cs]
+generated_code = true

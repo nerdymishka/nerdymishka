@@ -17,6 +17,7 @@ function Get-BuildArtifactsDirectory()
         throw "Could not locate the root folder"
     }
     $dir = "$root/artifacts"
+    Write-host $dir 
     Set-BuildVariable -Name "NM_BUILD_ARTIFACTS_DIR" -Value $dir   
 
     return $dir 

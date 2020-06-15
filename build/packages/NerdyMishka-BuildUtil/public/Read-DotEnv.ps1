@@ -58,9 +58,9 @@ function Read-DotEnv()
                     $n = $n.TrimEnd("`"")
                 }
 
-                $sb.Append($n);
+                [void]$sb.Append($n);
                 Set-BuildVariable -Name $Name -Value ($sb.ToString())
-                $sb.Clear()
+                [void]$sb.Clear()
                 $Name = $Null 
                 continue;
             }
@@ -69,14 +69,14 @@ function Read-DotEnv()
             {
                 $json = $false 
                 $multiLine = $false;
-                $sb.Append($line);
+                [void]$sb.Append($line);
                 Set-BuildVariable -Name $Name -Value ($sb.ToSTring())
-                $sb.Clear()
+                [void]$sb.Clear()
                 $Name = $Null 
                 continue; 
             }
 
-            $sb.AppendLine($line);
+            [void]$sb.AppendLine($line);
             continue;
         }
 
@@ -113,7 +113,7 @@ function Read-DotEnv()
                 {
                     $multiLine = $true;
                     $quote = $true;
-                    $sb.AppendLine($v.TrimStart("`""));
+                    [void]$sb.AppendLine($v.TrimStart("`""));
                 }
             }
 
@@ -128,7 +128,7 @@ function Read-DotEnv()
                     $multiLine = $true;
                     $quote = $true;
                     $single = $true
-                    $sb.AppendLine($v.TrimString("'")); 
+                    [void]$sb.AppendLine($v.TrimString("'")); 
                 }
             }
 
@@ -136,7 +136,7 @@ function Read-DotEnv()
             {
                 $multiLine = $true;
                 $json = $true;
-                $sb.AppendLine($v)
+                [void]$sb.AppendLine($v)
             }
 
             if ($multiLine)

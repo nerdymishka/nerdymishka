@@ -13,6 +13,7 @@ function Set-BuildVariable()
 
     if($InputObject -is [string])
     {
+        $Name = $InputObject
         if($ENV:TF_BUILD)
         {
             Write-Host "##vso[task.setvariable variable=$Name]$Value"

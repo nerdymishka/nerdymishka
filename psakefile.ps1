@@ -1,18 +1,23 @@
 
-$config = Get-Content -RAw "$PsScriptRoot" | ConvertFrom-Json 
+Import-Module "$PSScriptRoot/build/packages/NerdyMishka-BuildUtil" -Force
 
-Properties {
 
+Task "dotenv" {
+    Read-DotEnv 
 }
 
 Task "nuget:restore" {
     dotnet restore 
 }
 
-Task "test:unit" {
-    dotnet test -c $msbuild.configuration --filter tag=unit -r "$testDir"
+Task "test:unit" -depends "nuget:restore", "build"  {
+    $c = $ENV:MSBUILD_CONFIGURATION
+    dotnet test -c $c --filter tag=unit -r "$testDir"
 }
 
-Task "build" {
-    dotnet build 
+Task "build" -depends  "dotenv", "nuget:restore" 
+
+Task "build:projects"  {
+    $c = $ENV:MSBUILD_CONFIGURATION
+    dotnet build -c $c --no-restore
 }

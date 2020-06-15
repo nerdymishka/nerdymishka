@@ -1,1 +1,1 @@
-NM_BUILD_NUMBER_FORMAT='$(SourceBranchName): '
+MSBUILD_CONFIGURATION="Release"
