@@ -4,7 +4,10 @@ function New-BuildNumber() {
     Param(
         [String] $Format = $null,
 
-        [String] $BuildNumber 
+        [String] $BuildNumber,
+
+        [Parameter(ValueFromPipelineByPropertyName = $true)]
+        [String] $DatabasePath 
     )
 
     if([string]::IsNullOrWhiteSpace($Format))
@@ -38,29 +41,32 @@ function New-BuildNumber() {
     }
 
     $definition = Get-BuildDefinitionName 
-    $section = Read-LocalBuildDatabase -Query $defintion 
+    $db = Get-LocalBuildDatabase -InputObject $DatabasePath 
+    $section = Read-LocalBuildDatabase -Query $definition -DatabasePath $DatabasePath
     $branch = Get-GitBranch -CurrentOnly
     $r = 0
+    $now = [datetime]::UtcNow
     if(!$section)
     {
-        $db = Get-LocalBuildDatabase
+       
         $teamProject = $ENV:SYSTEM_TEAMPROJECT
         if(!$teamProject) { $teamProject = $ENV:NM_PROJECT }
         if(!$teamProject) { 
-            $info = Get-GitProjectName 
+            $info = Get-GitProjectInfo 
             $teamProject = $info.project 
         }
 
         $data = [PsCustomObject]@{
             revision = 0
             buildId = 0
-            lastBuild = [DateTime]::UtcNow
+            lastBuild = $now 
             project = $teamProject
             sourceBranch = $branch 
         } 
-        $section | Add-Member -MemberType NoteProperty -Name $definition -Value $data 
+        $db | Add-Member -MemberType NoteProperty -Name $definition -Value $data
+        $section = $data 
     }
-    $now = [datetime]::UtcNow
+    
     $r = $section.revision
     $buildId = $section.buildId 
     $lastBuild = $section.lastBuild 
@@ -77,8 +83,9 @@ function New-BuildNumber() {
     $section.lastBuild = $now; 
     $section.sourceBranch = $branch
 
-    $db.$definition = $section
-    $db | Write-LocalBuildDatabase
+   
+    $db | Add-Member -MemberType NoteProperty -Force -Name $definition -Value $section | Out-Null 
+    $db | Write-LocalBuildDatabase  -DatabasePath $DatabasePath
 
     $model = @{
         "Build.DefinitionName" = $definition
@@ -94,28 +101,29 @@ function New-BuildNumber() {
         "Minutes" = $now.Minutes 
         "Month" = $now.Month
         "Seconds" = $now.Seconds 
-        "Year" = $now.YEar 
+        "Year" = $now.Year 
     }
     
-    $c = $Format;
-
     $sb = New-Object System.Text.StringBuilder 
     $token = New-Object System.Text.StringBuilder  
     $inToken = $false;
-    for($i = 0; $i -lt $Format.Length; $i++)
+    $f = $Format
+    for($i = 0; $i -lt $f.Length; $i++)
     {
-        $c = $Format[$i];
-        if($c -eq '$' -and $Format[$i + 1] -eq "(")
+        $c = $f[$i];
+        if($c -eq '$' -and $f[$i + 1] -eq "(")
         {
+            $i++;
             $inToken = $true;
             continue;
         }
 
         if($inToken)
         {
+
             if([Char]::IsLetterOrDigit($c) -or $c -eq '.' -or $c -eq "_" -or $c -eq ":")
             {
-                $token.Append($c);
+                [void]$token.Append($c);
                 continue;
             }
 
@@ -123,12 +131,13 @@ function New-BuildNumber() {
             {
                 $inToken = $false;
                 $t = $token.ToString()
-                $token = New-Object System.Text.StringBuilder
-                $format = $null 
+                [void]$token.Clear()
+                $tokenFormat = $null
+
                 if($t -match ":")
                 {
                     $p = $t.Split(":");
-                    $format = $p[1]
+                    $tokenFormat = $p[1]
                     $t = $p[0];
                 }
                 
@@ -144,28 +153,31 @@ function New-BuildNumber() {
                     }
                 }
 
-                if($format)
+                if($tokenFormat)
                 {
-                    if($value -is [Date])
+                    if($value -is [DateTime])
                     {
-                        $value = [string]::Format($value, $format)
+                        $value = [string]::Format("{0:$tokenFormat}", $value)
                     }
                     
                     if($value -is [Int32])
                     {
-                        $format = $format.Replace($format[0], "0")
-                        $value = [string]::Format("{0:$format}", $value)
+                        $tokenFormat = $tokenFormat.Replace($tokenFormat[0], "0")
+                        $value = [string]::Format("{0:$tokenFormat}", $value)
                     }
                 }
 
-                $sb.Append($value)
+                [void]$sb.Append($value)
                 continue;
             }
+
+            continue 
         }
 
-        $sb.Append($c);
+        [void]$sb.Append($c);
     }
 
-    $ENV:NM_BUILD_NUMBER = $sb.ToString()
+    $ENV:NM_BUILD_NUMBER = $sb.ToString().Trim()
+    [void]$sb.Clear()
     return $ENV:NM_BUILD_NUMBER
 }

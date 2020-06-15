@@ -4,6 +4,7 @@ function Write-LocalBuildDatabase()
         [Parameter(Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true)]
         [Object] $InputObject,
 
+        [Alias("DatabasePath")]
         [Parameter(ValueFromPipelineByPropertyName = $true)]
         [String] $Destination 
     )

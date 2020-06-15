@@ -4,9 +4,6 @@ function New-NugetConfig()
     Param(
         [Parameter(Position = 0, ValueFromPipelineByPropertyName = $true)]
         [String] $Destination,
-        
-        [Parameter(ValueFromPipeline = $true)]
-        [String] $InputObject,
 
         [Switch] $Force 
     )
@@ -14,54 +11,13 @@ function New-NugetConfig()
     if([string]::IsNullOrWhiteSpace($Destination))
     {
         $path = $PWD.Path.Replace("\", "/")
-        $Destination = "$path/Nuget.config"
+        $Destination = $path 
     }
 
-    if(!$Destination.EndsWith("Nuget.config"))
+    if((Test-PAth "$Destination/nuget.confg") -and $force.ToBool())
     {
-        $Destination += "/Nuget.config";
+        remove-item "$Destination/nuget.config" -Force | Write-Debug 
     }
 
-    $xmlString = "<?xml version=`"1.0`" encoding=`"utf-8`"?>
-    <configuration>
-      <packageSources>
-        <clear />
-        <add key=`"nuget.org`" value=`"https://api.nuget.org/v3/index.json`" />
-      </packageSources>
-    </configuration>"
-
-    if(![string]::IsNullOrWhiteSpace($InputObject))
-    {
-        $xmlString = $InputObject;
-    }
-
-    $path = [IO.Path]::GetDirectoryName($Destination)
-
-    if(!(Test-Path $path))
-    {
-        if($Force.ToBool())
-        {
-            New-Item $path -ItemType Directory | Write-Debug 
-        } 
-        else 
-        {
-            throw [IO.DirectoryNotFoundException] $path 
-        }      
-    }
-
-
-
-    $xml = [xml]$xmlString
-    if(Test-Path $Destination)
-    {
-        if($Force.ToBool())
-        {
-            Remove-Item $Destination -Force 
-            $xml.Save($Destination);
-        }
-
-        return;
-    }
-    
-    $xml.Save($Destination);
+    dotnet new nuget -o $path 
 }

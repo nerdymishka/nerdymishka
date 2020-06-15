@@ -25,7 +25,7 @@ function Get-LocalBuildDatabase()
             New-Item $dir -ItemType Directory | Write-Debug
         }
 
-        $content = "{}" | ConvertTo-Json 
+        $content = "{}"
         [IO.File]::WriteAllText($InputObject, $content)
     }
 
