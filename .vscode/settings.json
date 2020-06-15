@@ -6,5 +6,7 @@
         "nerdy",
         "nerdy mishka"
     ],
-    "powershell.codeFormatting.preset": "Allman"
+    "powershell.codeFormatting.preset": "Allman",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true
 }
