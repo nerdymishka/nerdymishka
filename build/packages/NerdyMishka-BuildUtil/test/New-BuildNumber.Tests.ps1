@@ -11,7 +11,7 @@ InModuleScope -ModuleName "NerdyMishka-BuildUtil" {
             Remove-Item $dbPath
         }
 
-        IT "should generate a new build number and create build99.db file" {
+        It "should generate a new build number and create build99.db file" {
             $ENV:NM_BUILD_NUMBER = $null
             $value = New-BuildNumber -DatabasePath $dbPath 
             # this will fail if the new-buildnumber is created whne UTC switches days
@@ -21,7 +21,7 @@ InModuleScope -ModuleName "NerdyMishka-BuildUtil" {
             test-Path $dbPath | Should Be $true 
         }
 
-        IT "should generate a new revision number" {
+        It "should generate a new revision number" {
             $ENV:NM_BUILD_NUMBER = $null
             $value = New-BuildNumber -DatabasePath $dbPath 
             # this will fail if the new-buildnumber is created whne UTC switches days
@@ -30,8 +30,9 @@ InModuleScope -ModuleName "NerdyMishka-BuildUtil" {
             $value | Should Be "nerdymishka_Local_$dt.02"
         }
 
-       
-
-       
+        if(Test-Path $dbPath)
+        {
+            Remove-Item $dbPath
+        }
     }
 }

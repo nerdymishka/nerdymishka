@@ -5,7 +5,7 @@ InModuleScope -ModuleName "NerdyMishka-BuildUtil" {
     
     Describe "Read-LocalBuildDatabase" {
         
-        IT "should use NM_BUILD_DB" {
+        It "should use NM_BUILD_DB" {
             $ENV:NM_BUILD_DB = $null;
             $ENV:NM_BUILD_DB | Should Be $null
             $ENV:NM_BUILD_DB = "$PSScriptRoot/build1.db"
@@ -20,7 +20,7 @@ InModuleScope -ModuleName "NerdyMishka-BuildUtil" {
             }            
         }
 
-        IT "should use DatabasePath" {
+        It "should use DatabasePath" {
             $ENV:NM_BUILD_DB = $null;
             $ENV:NM_BUILD_DB | Should Be $null
             
