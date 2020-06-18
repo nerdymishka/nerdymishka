@@ -1,16 +1,17 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 namespace NerdyMishka.Text.DotEnv
 {
-    public class Lexer
+    public static class Lexer
     {
         public static IReadOnlyList<Token> Tokenize(string content)
         {
+            if (content is null)
+                throw new ArgumentNullException(nameof(content));
+
             using (var sr = new StringReader(content))
             {
                 return Tokenize(sr);
@@ -19,8 +20,11 @@ namespace NerdyMishka.Text.DotEnv
 
         public static IReadOnlyList<Token> Tokenize(TextReader reader)
         {
+            if (reader is null)
+                throw new ArgumentNullException(nameof(reader));
+
             Span<char> buffer = stackalloc char[1024];
-            var last = Char.MinValue;
+            var last = char.MinValue;
             int bytesRead = 0;
             var sb = new System.Text.StringBuilder();
             var list = new List<Token>();
@@ -32,8 +36,10 @@ namespace NerdyMishka.Text.DotEnv
                     list.Add(new ValueToken(sb2));
                     sb2.Clear();
                 }
+
                 list.Add(t);
             };
+
             do
             {
                 bytesRead = reader.ReadBlock(buffer);
@@ -47,6 +53,7 @@ namespace NerdyMishka.Text.DotEnv
                             sb.Remove(sb.Length - 1, 1);
                             list.Add(new ValueToken(sb));
                         }
+
                         list.Add(Token.LineBreak);
                         sb.Clear();
                         last = c;
@@ -60,6 +67,7 @@ namespace NerdyMishka.Text.DotEnv
                             sb.Remove(sb.Length - 1, 1);
                             list.Add(new ValueToken(sb));
                         }
+
                         list.Add(Token.NewLine);
                         sb.Clear();
                         last = c;
@@ -96,13 +104,15 @@ namespace NerdyMishka.Text.DotEnv
 
                     last = c;
                 }
-            } while (bytesRead > 0);
+            }
+            while (bytesRead > 0);
 
             if (sb.Length > 0)
             {
                 list.Add(new ValueToken(sb));
                 sb.Clear();
             }
+
             sb = null;
             return list;
         }

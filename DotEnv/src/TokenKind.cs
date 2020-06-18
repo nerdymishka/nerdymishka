@@ -1,4 +1,3 @@
-
 namespace NerdyMishka.Text.DotEnv
 {
     public enum TokenKind
@@ -23,6 +22,6 @@ namespace NerdyMishka.Text.DotEnv
 
         JsonStart,
 
-        JsonEnd
+        JsonEnd,
     }
 }

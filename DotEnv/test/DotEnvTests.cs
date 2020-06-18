@@ -1,6 +1,5 @@
-using System;
-using Xunit;
 using NerdyMishka;
+using Xunit;
 
 namespace Tests
 {
@@ -9,11 +8,13 @@ namespace Tests
         [Fact]
         public void Test1()
         {
+            // TEST_DOUBLE purposely has whitespace before the quotet to test
+            // trimming whitespace for values.
             var configValue = @"
 TEST_VALUE=x
 TEST_DOUBLE_ONE_LINE=""my multiline \ntext""
 TEST_SINGLE_ONE_LINE='single'
-TEST_DOUBLE=""woah
+TEST_DOUBLE= ""woah
 I have multiline values
 yea!""
 TEST_EMPTY=
@@ -39,7 +40,7 @@ TEST_JSON={
             var multi = @"woah
 I have multiline values
 yea!";
-            var values = DotEnv.ReadString(configValue);
+            var values = DotEnvReader.ReadString(configValue);
             Assert.NotNull(values);
 
             Assert.Equal("x", values["TEST_VALUE"]);

@@ -6,13 +6,13 @@ using NerdyMishka.Text.DotEnv;
 
 namespace NerdyMishka
 {
-    public class DotEnv
+    public static class DotEnvReader
     {
-        public static void Configure(string filename = null)
+        public static void ConfigureEnvironment(string filename = null)
         {
             if (string.IsNullOrWhiteSpace(filename))
             {
-                var path = typeof(DotEnv).Assembly.CodeBase;
+                var path = typeof(DotEnvReader).Assembly.CodeBase;
                 var parent = System.IO.Path.GetDirectoryName(path);
                 filename = System.IO.Path.Combine(parent, ".env");
             }
@@ -23,13 +23,17 @@ namespace NerdyMishka
             var variables = ReadFile(filename);
             foreach (var key in variables.Keys)
             {
-                System.Environment.SetEnvironmentVariable(key, variables[key],
+                System.Environment.SetEnvironmentVariable(key,
+                    variables[key],
                     EnvironmentVariableTarget.Process);
             }
         }
 
         public static IDictionary<string, string> ReadFile(string filename, Encoding encoding = null)
         {
+            if (filename is null)
+                throw new ArgumentNullException(nameof(filename));
+
             encoding = encoding ?? new UTF8Encoding(false);
             using (var sr = new StreamReader(filename, encoding))
             using (var parser = new Parser())
@@ -42,6 +46,9 @@ namespace NerdyMishka
 
         public static IDictionary<string, string> ReadString(string content)
         {
+            if (content is null)
+                throw new ArgumentNullException(nameof(content));
+
             using (var sr = new StringReader(content))
             using (var parser = new Parser())
             {

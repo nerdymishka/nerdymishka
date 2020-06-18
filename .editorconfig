@@ -2,3 +2,5 @@
 generated_code = true
 [*.AssemblyAttributes.cs]
 generated_code = true
+[*.Version.cs]
+generated_code = true

@@ -1,7 +1,5 @@
-
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace NerdyMishka.Text.DotEnv
 {
@@ -19,9 +17,9 @@ namespace NerdyMishka.Text.DotEnv
         {
             None = 0,
 
-            Single = 1,
+            SingleQuote = 1,
 
-            Double = 2,
+            DoubleQuote = 2,
 
             Json = 3,
         }
@@ -38,7 +36,7 @@ namespace NerdyMishka.Text.DotEnv
 
             Multiline = 4,
 
-            End = 400
+            End = 400,
         }
 
         public IDictionary<string, string> Parse(IReadOnlyList<Token> tokens)
@@ -57,6 +55,7 @@ namespace NerdyMishka.Text.DotEnv
                             this.result.Clear();
                             return r;
                         }
+
                     case ParserState.Comment:
                         state = this.MoveNextLine(token);
                         break;
@@ -70,7 +69,7 @@ namespace NerdyMishka.Text.DotEnv
                         state = this.VisitMultiline(token);
                         break;
                     case ParserState.Value:
-                        state = this.VisitValue(token, state);
+                        state = this.VisitValue(token);
                         break;
                 }
             }
@@ -78,6 +77,23 @@ namespace NerdyMishka.Text.DotEnv
             var r2 = new Dictionary<string, string>(this.result);
             this.result.Clear();
             return r2;
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool dispose)
+        {
+            if (dispose)
+            {
+                this.stream.Dispose();
+                this.stream = null;
+                this.lastWord = null;
+                this.result = null;
+            }
         }
 
         private ParserState VisitKey(Token token)
@@ -140,7 +156,6 @@ namespace NerdyMishka.Text.DotEnv
                 // transform \n into line break
                 if (token.Kind == TokenKind.LineBreak)
                 {
-
                     if (!this.stream.Consume())
                         return ParserState.End;
 
@@ -203,20 +218,20 @@ namespace NerdyMishka.Text.DotEnv
 
         private ParserState VisitMultiline(Token token)
         {
-            switch (valueState)
+            switch (this.valueState)
             {
-                case ValueState.Double:
+                case ValueState.DoubleQuote:
                     return this.VisitDoubleQuote(token);
-                case ValueState.Single:
+                case ValueState.SingleQuote:
                     return this.VisitSingleQuote(token);
                 case ValueState.Json:
                     return this.VisitJson(token);
                 default:
-                    throw new NotSupportedException("");
+                    throw new NotSupportedException($"unsupported value state {this.valueState}");
             }
         }
 
-        private ParserState VisitValue(Token token, ParserState state)
+        private ParserState VisitValue(Token token)
         {
             if (this.stream.WordLength == 0 && this.valueState.HasFlag(ValueState.None))
             {
@@ -228,13 +243,13 @@ namespace NerdyMishka.Text.DotEnv
                     case TokenKind.WhiteSpace:
                         return ParserState.Value;
                     case TokenKind.DoubleQuote:
-                        this.valueState = ValueState.Double;
+                        this.valueState = ValueState.DoubleQuote;
                         if (!this.stream.MoveNext())
                             return ParserState.End;
                         token = this.stream.Current;
                         break;
                     case TokenKind.SingleQuote:
-                        this.valueState = ValueState.Single;
+                        this.valueState = ValueState.SingleQuote;
                         if (!this.stream.MoveNext())
                             return ParserState.End;
                         token = this.stream.Current;
@@ -254,9 +269,9 @@ namespace NerdyMishka.Text.DotEnv
 
                 switch (this.valueState)
                 {
-                    case ValueState.Double:
+                    case ValueState.DoubleQuote:
                         return this.VisitDoubleQuoteLine(token);
-                    case ValueState.Single:
+                    case ValueState.SingleQuote:
                         return this.VisitSingleQuoteLine(token);
                 }
             }
@@ -363,23 +378,6 @@ namespace NerdyMishka.Text.DotEnv
                     {
                         throw new NotSupportedException(token.Kind.ToString());
                     }
-            }
-        }
-
-        public virtual void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool dispose)
-        {
-            if (dispose)
-            {
-                this.stream.Dispose();
-                this.stream = null;
-                this.lastWord = null;
-                this.result = null;
             }
         }
     }

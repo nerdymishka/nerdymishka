@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Xunit
@@ -12,7 +13,8 @@ namespace Xunit
         public const string SubstitutionToken = ".{Platform}";
 
         private const string ExecutionAssemblyNamePrefix = "xunit.execution.";
-#if NETSTANDARD
+
+#if NETSTANDARD || NETCOREAPP5_0
         private static readonly string[] PlatformSuffixes = new[] { "dotnet", "MonoAndroid", "iOS-Universal" };
 #endif
 
@@ -29,8 +31,7 @@ namespace Xunit
                     if (platformSuffix == "__unknown__")
                     {
                         platformSuffix = null;
-
-#if NETSTANDARD
+#if NETSTANDARD || NETCOREAPP5_0
                         foreach (var suffix in PlatformSuffixes)
                         {
                             try
@@ -50,7 +51,7 @@ namespace Xunit
                         foreach (var name in AppDomain.CurrentDomain.GetAssemblies().Select(a => a?.GetName()?.Name))
                             if (name != null && name.StartsWith(executionAssemblyNamePrefix, StringComparison.Ordinal))
                             {
-                                platformSuffix = name.Substring(executionAssemblyNamePrefix.Length);
+                                platformSuffix = name.Substring(ExecutionAssemblyNamePrefix.Length);
                                 break;
                             }
 #endif

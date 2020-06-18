@@ -4,7 +4,8 @@
         "Xunit",
         "mishka",
         "nerdy",
-        "nerdy mishka"
+        "nerdy mishka",
+        "woah"
     ],
     "powershell.codeFormatting.preset": "Allman",
     "editor.formatOnSave": true,

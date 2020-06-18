@@ -27,6 +27,8 @@ namespace NerdyMishka.Text.DotEnv
 
         public int WordLength => this.sb.Length;
 
+        public StringBuilder Builder => this.sb;
+
         public void Reset()
         {
             this.position = -1;
@@ -39,8 +41,6 @@ namespace NerdyMishka.Text.DotEnv
 
             return this.tokens[index];
         }
-
-        public StringBuilder Builder => this.sb;
 
         public bool MoveNext()
         {
@@ -76,7 +76,7 @@ namespace NerdyMishka.Text.DotEnv
             return word;
         }
 
-        public virtual void Dispose()
+        public void Dispose()
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
@@ -90,7 +90,7 @@ namespace NerdyMishka.Text.DotEnv
                 {
                     if (token is ValueToken)
                     {
-                        Array.Clear(token.Value, 0, token.Value.Length);
+                        token.Clear();
                     }
                 }
 

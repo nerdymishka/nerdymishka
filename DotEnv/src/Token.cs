@@ -1,16 +1,13 @@
-using System;
-using System.Buffers;
-using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NerdyMishka.Text.DotEnv
 {
     public abstract class Token
     {
-        public TokenKind Kind { get; set; }
+        private char[] set;
 
-        public char[] Value { get; protected set; }
-
-        public static Token None => new CharToken(Char.MinValue, TokenKind.None);
+        public static Token None => new CharToken(char.MinValue, TokenKind.None);
 
         public static CharToken Assign => new CharToken('=', TokenKind.Assign);
 
@@ -29,5 +26,28 @@ namespace NerdyMishka.Text.DotEnv
         public static NewLineToken NewLine => new NewLineToken();
 
         public static LineBreakToken LineBreak => new LineBreakToken();
+
+        public TokenKind Kind { get; set; }
+
+        public IReadOnlyList<char> Value
+        {
+            get => this.set;
+            set
+            {
+                if (value == null || value.Count == 0)
+                {
+                    this.set = System.Array.Empty<char>();
+                    return;
+                }
+
+                this.set = value.ToArray();
+            }
+        }
+
+        protected internal void Clear()
+        {
+            System.Array.Clear(this.set, 0, this.set.Length);
+            this.set = null;
+        }
     }
 }
