@@ -1,9 +1,14 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using NerdyMishka.Util.Binary;
 
 namespace NerdyMishka.Security.Cryptography
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>http://cr.yp.to/snuffle/spec.pdf</remarks>
     internal class Salsa20Transform : ICryptoTransform
     {
         // https://dotnetfiddle.net/Bh4ijW
@@ -131,10 +136,23 @@ namespace NerdyMishka.Security.Cryptography
         private static void AddRotateXor(uint[] state, uint[] buffer, byte[] output, int rounds)
         {
             Array.Copy(state, buffer, 16);
-            var v = buffer;
 
             for (var i = 0; i < rounds; i++)
             {
+                QuarterRound(buffer, 0, 4, 8, 12);
+                QuarterRound(buffer, 5, 9, 13, 1);
+                QuarterRound(buffer, 10, 14, 2, 6);
+                QuarterRound(buffer, 15, 3, 7, 11);
+
+                QuarterRound(buffer, 0, 1, 2, 3);
+                QuarterRound(buffer, 5, 6, 7, 4);
+                QuarterRound(buffer, 10, 11, 8, 9);
+                QuarterRound(buffer, 15, 12, 13, 14);
+
+
+                /* 
+                TODO: test perf
+                QB expanded
                 v[4] ^= BitShift.RotateLeft32(v[0] + v[12], 7);
                 v[8] ^= BitShift.RotateLeft32(v[4] + v[0], 9);
                 v[12] ^= BitShift.RotateLeft32(v[8] + v[4], 13);
@@ -167,20 +185,30 @@ namespace NerdyMishka.Security.Cryptography
                 v[13] ^= BitShift.RotateLeft32(v[12] + v[15], 9);
                 v[14] ^= BitShift.RotateLeft32(v[13] + v[12], 13);
                 v[15] ^= BitShift.RotateLeft32(v[14] + v[13], 18);
+                */
             }
 
             for (int i = 0; i < 16; ++i)
             {
-                v[i] += state[i];
-                output[i << 2] = (byte)v[i];
-                output[(i << 2) + 1] = (byte)(v[i] >> 8);
-                output[(i << 2) + 2] = (byte)(v[i] >> 16);
-                output[(i << 2) + 3] = (byte)(v[i] >> 24);
+                buffer[i] += state[i];
+                output[i << 2] = (byte)buffer[i];
+                output[(i << 2) + 1] = (byte)(buffer[i] >> 8);
+                output[(i << 2) + 2] = (byte)(buffer[i] >> 16);
+                output[(i << 2) + 3] = (byte)(buffer[i] >> 24);
             }
 
             state[8]++;
             if (state[8] == 0)
                 state[9]++;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void QuarterRound(uint[] set, uint a, uint b, uint c, uint d)
+        {
+            set[b] ^= BitShift.RotateLeft32(set[a] + set[d], 7);
+            set[c] ^= BitShift.RotateLeft32(set[b] + set[a], 9);
+            set[d] ^= BitShift.RotateLeft32(set[c] + set[b], 13);
+            set[a] ^= BitShift.RotateLeft32(set[d] + set[c], 18);
         }
 
         private static uint[] CreateState(byte[] key, byte[] iv)

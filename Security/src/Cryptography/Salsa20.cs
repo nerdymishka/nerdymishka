@@ -37,7 +37,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <summary>
         /// Gets or sets whether or skip a XOR operation during the transform block.
         /// </summary>
-        public bool SkipXor { get; set; }
+        internal bool SkipXor { get; set; }
 
         /// <summary>
         /// Gets the block sizes, in bits, that are supported by the symmetric algorithm.

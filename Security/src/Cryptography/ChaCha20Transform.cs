@@ -1,9 +1,15 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using NerdyMishka.Util.Binary;
 
 namespace NerdyMishka.Security.Cryptography
 {
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>https://cr.yp.to/chacha/chacha-20080128.pdf</remarks>
     internal class ChaCha20Transform : ICryptoTransform, IDisposable
     {
         // https://dotnetfiddle.net/Bh4ijW
@@ -135,34 +141,30 @@ namespace NerdyMishka.Security.Cryptography
 
         private static void AddXorRotate(uint[] state, uint[] buffer, byte[] bitSet)
         {
-            var set = buffer;
-            for (int i = 16; i-- > 0;)
-            {
-                set[i] = state[i];
-            }
+            Array.Copy(state, buffer, state.Length);
 
             for (int i = 20; i > 0; i -= 2)
             {
-                QuarterRound(set, 0, 4, 8, 12);
-                QuarterRound(set, 1, 5, 9, 13);
-                QuarterRound(set, 2, 6, 10, 14);
-                QuarterRound(set, 3, 7, 11, 15);
+                QuarterRound(buffer, 0, 4, 8, 12);
+                QuarterRound(buffer, 1, 5, 9, 13);
+                QuarterRound(buffer, 2, 6, 10, 14);
+                QuarterRound(buffer, 3, 7, 11, 15);
 
-                QuarterRound(set, 0, 5, 10, 15);
-                QuarterRound(set, 1, 6, 11, 12);
-                QuarterRound(set, 2, 7, 8, 13);
-                QuarterRound(set, 3, 4, 9, 14);
+                QuarterRound(buffer, 0, 5, 10, 15);
+                QuarterRound(buffer, 1, 6, 11, 12);
+                QuarterRound(buffer, 2, 7, 8, 13);
+                QuarterRound(buffer, 3, 4, 9, 14);
             }
 
             for (int i = 16; i-- > 0;)
             {
-                set[i] += state[i];
+                buffer[i] += state[i];
 
                 // converts unit to little endian using an offset.
-                bitSet[i << 2] = (byte)set[i];
-                bitSet[(i << 2) + 1] = (byte)(set[i] >> 8);
-                bitSet[(i << 2) + 2] = (byte)(set[i] >> 16);
-                bitSet[(i << 2) + 3] = (byte)(set[i] >> 24);
+                bitSet[i << 2] = (byte)buffer[i];
+                bitSet[(i << 2) + 1] = (byte)(buffer[i] >> 8);
+                bitSet[(i << 2) + 2] = (byte)(buffer[i] >> 16);
+                bitSet[(i << 2) + 3] = (byte)(buffer[i] >> 24);
             }
 
             state[12] = unchecked(state[12] + 1);
@@ -172,6 +174,7 @@ namespace NerdyMishka.Security.Cryptography
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void QuarterRound(uint[] set, uint a, uint b, uint c, uint d)
         {
             set[a] = unchecked(set[a] + set[b]);
