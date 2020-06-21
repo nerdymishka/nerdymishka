@@ -16,6 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="../../Mettle/src/*.csproj" />
     <ProjectReference Include="../src/*.csproj" />
+    <ProjectReference Include="../../Primitives/src/*.csproj" />
   </ItemGroup>
 
 </Project>
