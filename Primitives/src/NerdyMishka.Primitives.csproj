@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(DotNetFrameworks)</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
    
