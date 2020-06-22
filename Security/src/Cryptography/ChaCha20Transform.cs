@@ -5,7 +5,6 @@ using NerdyMishka.Util.Binary;
 
 namespace NerdyMishka.Security.Cryptography
 {
-
     /// <summary>
     /// The ChaCha20 implementation.
     /// </summary>
