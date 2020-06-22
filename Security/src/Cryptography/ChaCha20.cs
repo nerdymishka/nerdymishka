@@ -46,6 +46,8 @@ namespace NerdyMishka.Security.Cryptography
 
         public int Counter { get; set; } = 0;
 
+        public ChaCha20Round Rounds { get; set; } = ChaCha20Round.Twenty;
+
 #pragma warning disable CS0109
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <returns>A symmetric decryptor object.</returns>
         public override ICryptoTransform CreateDecryptor(byte[] rgbKey, byte[] rgbIV)
         {
-            return new ChaCha20Transform(rgbKey, rgbIV, this.Counter);
+            return new ChaCha20Transform(rgbKey, rgbIV, this.Rounds, this.Counter);
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <returns>A symmetric encryptor object.</returns>
         public override ICryptoTransform CreateEncryptor(byte[] rgbKey, byte[] rgbIV)
         {
-            return new ChaCha20Transform(rgbKey, rgbIV, this.Counter);
+            return new ChaCha20Transform(rgbKey, rgbIV, this.Rounds, this.Counter);
         }
 
         public override void GenerateIV()

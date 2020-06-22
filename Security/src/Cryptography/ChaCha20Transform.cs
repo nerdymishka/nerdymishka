@@ -24,10 +24,13 @@ namespace NerdyMishka.Security.Cryptography
 
         private int bytesRemaining = 0;
 
+        private int rounds;
+
         private byte[] bitSet = new byte[64];
 
-        public ChaCha20Transform(byte[] key, byte[] iv, int counter = 0)
+        public ChaCha20Transform(byte[] key, byte[] iv, ChaCha20Round rounds, int counter = 0)
         {
+            this.rounds = (int)rounds;
             this.state = CreateState(key, iv, counter);
         }
 
@@ -57,7 +60,7 @@ namespace NerdyMishka.Security.Cryptography
             {
                 if (this.bytesRemaining == 0)
                 {
-                    AddXorRotate(this.state, this.stateBuffer, this.bitSet);
+                    AddXorRotate(this.state, this.rounds, this.stateBuffer, this.bitSet);
                     this.bytesRemaining = 64;
                     internalOffset = 0;
                 }
@@ -109,7 +112,7 @@ namespace NerdyMishka.Security.Cryptography
             }
         }
 
-        private static uint[] CreateState(byte[] key, byte[] iv, int counter)
+        internal static uint[] CreateState(byte[] key, byte[] iv, int counter)
         {
             var state = new uint[16];
             var constants = key.Length == 32 ? Sigma : Tau;
@@ -131,18 +134,37 @@ namespace NerdyMishka.Security.Cryptography
             state[11] = LittleEndianBitConverter.ToUInt32(key, offset + 12);
 
             state[12] = (uint)counter;
-            state[13] = LittleEndianBitConverter.ToUInt32(iv, 0);
-            state[14] = LittleEndianBitConverter.ToUInt32(iv, 4);
-            state[15] = LittleEndianBitConverter.ToUInt32(iv, 8);
+            switch (iv.Length)
+            {
+                // the test cases only uses 8
+                // https://github.com/secworks/chacha_testvectors/blob/master/src/gen_chacha_testvectors.c
+                case 8:
+                    state[13] = 0;
+                    state[14] = LittleEndianBitConverter.ToUInt32(iv, 0);
+                    state[15] = LittleEndianBitConverter.ToUInt32(iv, 4);
+                    break;
+                case 12:
+                    state[13] = LittleEndianBitConverter.ToUInt32(iv, 0);
+                    state[14] = LittleEndianBitConverter.ToUInt32(iv, 4);
+                    state[15] = LittleEndianBitConverter.ToUInt32(iv, 8);
+                    break;
+                case 16:
+                    // overwrites the counter
+                    state[12] = LittleEndianBitConverter.ToUInt32(iv, 0);
+                    state[13] = LittleEndianBitConverter.ToUInt32(iv, 4);
+                    state[14] = LittleEndianBitConverter.ToUInt32(iv, 8);
+                    state[15] = LittleEndianBitConverter.ToUInt32(iv, 12);
+                    break;
+            }
 
             return state;
         }
 
-        private static void AddXorRotate(uint[] state, uint[] buffer, byte[] bitSet)
+        internal static void AddXorRotate(uint[] state, int rounds, uint[] buffer, byte[] bitSet)
         {
             Array.Copy(state, buffer, state.Length);
 
-            for (int i = 20; i > 0; i -= 2)
+            for (int i = rounds; i > 0; i -= 2)
             {
                 QuarterRound(buffer, 0, 4, 8, 12);
                 QuarterRound(buffer, 1, 5, 9, 13);
