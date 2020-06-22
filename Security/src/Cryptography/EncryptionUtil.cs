@@ -1,4 +1,9 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Text;
+using NerdyMishka.Text;
 
 namespace NerdyMishka.Security.Cryptography
 {
@@ -34,6 +39,31 @@ namespace NerdyMishka.Security.Cryptography
             }
 
             return new byte[l];
+        }
+
+        public static byte[] ToBytes(this SecureString secureString, Encoding encoding = null)
+        {
+            Check.NotNull(nameof(secureString), secureString);
+
+            IntPtr bstr = IntPtr.Zero;
+            var charArray = new char[secureString.Length];
+            encoding = encoding ?? Utf8Options.NoBom;
+
+            try
+            {
+                bstr = Marshal.SecureStringToBSTR(secureString);
+                Marshal.Copy(bstr, charArray, 0, charArray.Length);
+
+                var bytes = encoding.GetBytes(charArray);
+                return bytes;
+            }
+            finally
+            {
+                if (charArray != null && charArray.Length > 0)
+                    Array.Clear(charArray, 0, charArray.Length);
+
+                Marshal.ZeroFreeBSTR(bstr);
+            }
         }
 
         /*

@@ -35,11 +35,6 @@ namespace NerdyMishka.Security.Cryptography
         public Salsa20Round Rounds { get; set; }
 
         /// <summary>
-        /// Gets or sets whether or skip a XOR operation during the transform block.
-        /// </summary>
-        internal bool SkipXor { get; set; }
-
-        /// <summary>
         /// Gets the block sizes, in bits, that are supported by the symmetric algorithm.
         /// </summary>
         public override KeySizes[] LegalBlockSizes
@@ -60,8 +55,12 @@ namespace NerdyMishka.Security.Cryptography
                 return SalsaLegalKeySizes;
             }
         }
-
 #pragma warning disable CS0109
+
+        /// <summary>
+        /// Gets or sets whether or skip a XOR operation during the transform block.
+        /// </summary>
+        internal bool SkipXor { get; set; }
 
         /// <summary>
         /// Creates a new instance of <see cref="NerdyMishka.Security.Cryptography.Salsa20" />

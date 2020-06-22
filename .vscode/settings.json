@@ -2,6 +2,7 @@
     "cSpell.words": [
         "Algo",
         "BSTR",
+        "DPAPI",
         "HMAC",
         "HMACSHA",
         "Herndon",
@@ -14,6 +15,7 @@
         "mishka",
         "nerdy",
         "nerdy mishka",
+        "unprotect",
         "woah"
     ],
     "powershell.codeFormatting.preset": "Allman",

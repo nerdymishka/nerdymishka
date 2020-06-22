@@ -7,7 +7,7 @@ namespace NerdyMishka.Security.Cryptography
 {
 
     /// <summary>
-    /// 
+    /// The ChaCha20 implementation.
     /// </summary>
     /// <remarks>https://cr.yp.to/chacha/chacha-20080128.pdf</remarks>
     internal class ChaCha20Transform : ICryptoTransform, IDisposable

@@ -6,7 +6,7 @@ using NerdyMishka.Util.Binary;
 namespace NerdyMishka.Security.Cryptography
 {
     /// <summary>
-    /// 
+    /// The Salsa20 implementation.
     /// </summary>
     /// <remarks>http://cr.yp.to/snuffle/spec.pdf</remarks>
     internal class Salsa20Transform : ICryptoTransform
@@ -149,8 +149,7 @@ namespace NerdyMishka.Security.Cryptography
                 QuarterRound(buffer, 10, 11, 8, 9);
                 QuarterRound(buffer, 15, 12, 13, 14);
 
-
-                /* 
+                /*
                 TODO: test perf
                 QB expanded
                 v[4] ^= BitShift.RotateLeft32(v[0] + v[12], 7);
