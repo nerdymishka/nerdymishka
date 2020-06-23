@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using NerdyMishka.Text;
 using NerdyMishka.Util.Arrays;
 using NerdyMishka.Util.Collections;
 
@@ -10,21 +11,35 @@ namespace NerdyMishka.Security.Cryptography
 {
     /// <summary>
     /// Hash-Based Message Authenticated Code Stream that adds authenticated codes
-    /// using a given hash
+    /// using a given hash algorithm. This stream will write a block of bytes
+    /// from the inner stream, the block size, and then write a computed
+    /// hash with the given hash algorithm. The default encoding is UTF-8
+    /// with no Byte Order Mark ("BOM").
     /// </summary>
     public class HMACBlockStream : System.IO.Stream
     {
         private Stream innerStream;
+
         private BinaryReader reader;
+
         private BinaryWriter writer;
+
         private bool endOfStream = false;
+
         private byte[] endOfStreamMarker = new byte[32];
+
         private HashAlgorithmName hashAlgorithm;
+
         private KeyedHashAlgorithmType keyedHashAlgorithm;
+
         private HashAlgorithm signer;
+
         private byte[] internalBuffer;
+
         private int expectedPosition = 0;
+
         private bool disposed;
+
         private int bufferOffset = 0;
 
         /// <summary>
@@ -33,7 +48,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <param name="innerStream">The stream that will be read or written to.</param>
         /// <param name="write">If true, the stream will be written to; othewise, read from.</param>
         public HMACBlockStream(Stream innerStream, bool write = true)
-            : this(innerStream, write, new System.Text.UTF8Encoding(false, false), HashAlgorithmName.SHA256)
+            : this(innerStream, write, Utf8Options.NoBom, HashAlgorithmName.SHA256)
         {
         }
 
@@ -275,7 +290,7 @@ namespace NerdyMishka.Security.Cryptography
                 throw new Exception($"The stream's actual position {actualPosition} does not match the expected position {this.expectedPosition} ");
 
             this.expectedPosition++;
-            byte[] expectedHash = this.reader.ReadBytes(32);
+            byte[] expectedHash = this.reader.ReadBytes(this.signer.HashSize);
             int bufferSize = this.reader.ReadInt32();
 
             if (bufferSize == 0)
