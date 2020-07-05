@@ -7,7 +7,7 @@ namespace NerdyMishka.Windows.CredentialManager
     [CLSCompliant(false)]
     [SuppressMessage("", "SA1615:", Justification = "Return types are documented")]
     [SuppressMessage("", "SA1629:", Justification = "Documentation has periods")]
-    public static class VaultManager
+    public static class WindowsCredentialManager
     {
         private static readonly bool PlatformSupported = Environment.OSVersion.Platform.HasFlag(PlatformID.Win32NT);
 
@@ -49,6 +49,7 @@ namespace NerdyMishka.Windows.CredentialManager
             {
                 var bytes = cred.GetBlob();
                 Marshal.Copy(bytes, 0, data, (int)length);
+                Array.Clear(bytes, 0, (int)length);
             }
 
             var native = new NativeCredential()
@@ -68,8 +69,16 @@ namespace NerdyMishka.Windows.CredentialManager
 
             var isSet = WriteCredential(ref native, 0);
             int errorCode = Marshal.GetLastWin32Error();
+
+            Marshal.FreeHGlobal(native.Comment);
+            Marshal.FreeHGlobal(native.TargetAlias);
+            Marshal.FreeHGlobal(native.UserName);
+            Marshal.FreeHGlobal(native.TargetAlias);
+
             if (isSet)
+            {
                 return;
+            }
 
             throw new ExternalException($"Advapi32.dll -> CredWriteW failed to write credential. error code {errorCode}");
         }
@@ -119,7 +128,7 @@ namespace NerdyMishka.Windows.CredentialManager
         /// <exception cref="System.NotSupportedException">Thrown when called on a non Windows system .</exception>
         public static void Delete(string key, CredentialType type = CredentialType.Generic)
         {
-            VaultManager.Guard();
+            Guard();
 
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentNullException(nameof(key));
