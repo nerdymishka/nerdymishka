@@ -8,13 +8,15 @@ namespace NerdyMishka.Security.Cryptography
     /// <summary>
     /// The ChaCha20 implementation.
     /// </summary>
-    /// <remarks>https://cr.yp.to/chacha/chacha-20080128.pdf</remarks>
+    /// <remarks>https://cr.yp.to/chacha/chacha-20080128.pdf .</remarks>
     internal class ChaCha20Transform : ICryptoTransform, IDisposable
     {
         // https://dotnetfiddle.net/Bh4ijW
         private static readonly uint[] Sigma = new uint[] { 0x61707865, 0x3320646E, 0x79622D32, 0x6B206574 };
 
         private static readonly uint[] Tau = new uint[] { 0x61707865, 0x3120646E, 0x79622D36, 0x6B206574 };
+
+        private readonly int rounds;
 
         private uint[] state;
 
@@ -23,8 +25,6 @@ namespace NerdyMishka.Security.Cryptography
         private bool isDisposed = false;
 
         private int bytesRemaining = 0;
-
-        private int rounds;
 
         private byte[] bitSet = new byte[64];
 
@@ -52,9 +52,6 @@ namespace NerdyMishka.Security.Cryptography
             this.CheckDisposed();
 
             int bytesTransformed = 0;
-            int internalOffset = 0;
-            if (this.bytesRemaining > 0)
-                internalOffset = 64 - this.bytesRemaining;
 
             while (inputCount > 0)
             {
@@ -62,7 +59,6 @@ namespace NerdyMishka.Security.Cryptography
                 {
                     AddXorRotate(this.state, this.rounds, this.stateBuffer, this.bitSet);
                     this.bytesRemaining = 64;
-                    internalOffset = 0;
                 }
 
                 var length = Math.Min(this.bytesRemaining, inputCount);
@@ -93,23 +89,6 @@ namespace NerdyMishka.Security.Cryptography
         {
             this.Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.isDisposed)
-                return;
-
-            if (disposing)
-            {
-                this.isDisposed = true;
-                Array.Clear(this.bitSet, 0, this.bitSet.Length);
-                Array.Clear(this.state, 0, this.state.Length);
-                Array.Clear(this.stateBuffer, 0, this.stateBuffer.Length);
-                this.state = null;
-                this.stateBuffer = null;
-                this.bitSet = null;
-            }
         }
 
         internal static uint[] CreateState(byte[] key, byte[] iv, int counter)
@@ -192,6 +171,23 @@ namespace NerdyMishka.Security.Cryptography
             if (state[12] <= 0)
             {
                 state[13] = unchecked(state[13] + 1);
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.isDisposed)
+                return;
+
+            if (disposing)
+            {
+                this.isDisposed = true;
+                Array.Clear(this.bitSet, 0, this.bitSet.Length);
+                Array.Clear(this.state, 0, this.state.Length);
+                Array.Clear(this.stateBuffer, 0, this.stateBuffer.Length);
+                this.state = null;
+                this.stateBuffer = null;
+                this.bitSet = null;
             }
         }
 

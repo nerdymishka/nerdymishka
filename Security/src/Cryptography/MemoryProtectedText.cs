@@ -257,8 +257,8 @@ namespace NerdyMishka.Security.Cryptography
             if (other == null)
                 return false;
 
-            if (other is MemoryProtectedText)
-                return this.Equals((MemoryProtectedText)other);
+            if (other is MemoryProtectedText text1)
+                return this.Equals(text1);
 
             return false;
         }

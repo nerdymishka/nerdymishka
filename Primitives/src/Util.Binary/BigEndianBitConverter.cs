@@ -115,7 +115,7 @@ namespace NerdyMishka.Util.Binary
             Check.NotNullOrEmpty(nameof(value), value);
             Check.Count(nameof(value), value, 1);
 
-            return value[0] == 0 ? false : true;
+            return value[0] != 0;
         }
 
         public static bool ToBoolean(byte[] value, int startIndex)
@@ -123,7 +123,7 @@ namespace NerdyMishka.Util.Binary
             Check.NotNullOrEmpty(nameof(value), value);
             Check.Slice(nameof(value), value, startIndex, 1);
 
-            return value[startIndex] == 0 ? false : true;
+            return value[startIndex] != 0;
         }
 
         public static unsafe double ToDouble(byte[] value)

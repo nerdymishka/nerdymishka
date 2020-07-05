@@ -1,8 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NerdyMishka.Security.Cryptography
 {
+    [SuppressMessage(
+        "Microsoft.Naming",
+        "CA1710: Identifiers should have correct suffix",
+        Justification = "By Design")]
     public interface ICompositeKey : IEnumerable<ICompositeKeyFragment>, IDisposable
     {
         int Count { get; }

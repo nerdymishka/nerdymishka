@@ -7,12 +7,12 @@ namespace NerdyMishka.Security.Cryptography
     public static class NonceFactory
     {
         private static readonly List<byte[]> Nonces = new List<byte[]>();
-        private static object s_syncLock = new object();
-        private static NerdyRandomNumberGenerator s_rng = new NerdyRandomNumberGenerator();
+        private static readonly object SyncLock = new object();
+        private static readonly NerdyRandomNumberGenerator RandomNumberGenerator = new NerdyRandomNumberGenerator();
 
         public static void Clear(bool clearArray = false)
         {
-            lock (s_syncLock)
+            lock (SyncLock)
             {
                 if (clearArray)
                 {
@@ -28,7 +28,7 @@ namespace NerdyMishka.Security.Cryptography
 
         public static bool Remove(byte[] iv)
         {
-            lock (s_syncLock)
+            lock (SyncLock)
             {
                 var index = Nonces.FindIndex(o => o.SequenceEqual(iv));
                 if (index > -1)
@@ -43,16 +43,16 @@ namespace NerdyMishka.Security.Cryptography
 
         public static byte[] Generate(int size = 8)
         {
-            lock (s_syncLock)
+            lock (SyncLock)
             {
                 unsafe
                 {
                     var set = new byte[size];
-                    s_rng.NextBytes(set);
+                    RandomNumberGenerator.NextBytes(set);
 
                     while (Nonces.Any(o => o.SequenceEqual(set)))
                     {
-                        s_rng.NextBytes(set);
+                        RandomNumberGenerator.NextBytes(set);
                     }
 
                     Nonces.Add(set);

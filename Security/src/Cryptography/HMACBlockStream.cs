@@ -18,21 +18,19 @@ namespace NerdyMishka.Security.Cryptography
     /// </summary>
     public class HMACBlockStream : System.IO.Stream
     {
-        private Stream innerStream;
+        private readonly Stream innerStream;
 
-        private BinaryReader reader;
+        private readonly BinaryReader reader;
 
-        private BinaryWriter writer;
+        private readonly BinaryWriter writer;
+
+        private readonly byte[] endOfStreamMarker = new byte[32];
+
+        private readonly HashAlgorithmName hashAlgorithm;
+
+        private readonly HashAlgorithm signer;
 
         private bool endOfStream = false;
-
-        private byte[] endOfStreamMarker = new byte[32];
-
-        private HashAlgorithmName hashAlgorithm;
-
-        private KeyedHashAlgorithmType keyedHashAlgorithm;
-
-        private HashAlgorithm signer;
 
         private byte[] internalBuffer;
 
@@ -43,20 +41,22 @@ namespace NerdyMishka.Security.Cryptography
         private int bufferOffset = 0;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="NerdyMishka.Security.Cryptography.HMACBlockStream"/>
+        /// Initializes a new instance of the
+        /// <see cref="NerdyMishka.Security.Cryptography.HMACBlockStream"/> class.
         /// </summary>
         /// <param name="innerStream">The stream that will be read or written to.</param>
-        /// <param name="write">If true, the stream will be written to; othewise, read from.</param>
+        /// <param name="write">If true, the stream will be written to; otherwise, read from.</param>
         public HMACBlockStream(Stream innerStream, bool write = true)
             : this(innerStream, write, Utf8Options.NoBom, HashAlgorithmName.SHA256)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="NerdyMishka.Security.Cryptography.HMACBlockStream"/>
+        /// Initializes a new instance of the
+        /// <see cref="NerdyMishka.Security.Cryptography.HMACBlockStream"/> class.
         /// </summary>
         /// <param name="innerStream">The stream that will be read or written to.</param>
-        /// <param name="write">If true, the stream will be written to; othewise, read from.</param>
+        /// <param name="write">If true, the stream will be written to; otherwise, read from.</param>
         /// <param name="encoding">The encoding that the stream should use.</param>
         /// <param name="keyedHashAlgorithm">The keyed hash algorithm used to create an authentication code.</param>
         /// <param name="key">The key for the keyed hash algorithm.</param>
@@ -68,25 +68,25 @@ namespace NerdyMishka.Security.Cryptography
             byte[] key)
             : this(innerStream, write, encoding, HashAlgorithmName.SHA256)
         {
-            this.keyedHashAlgorithm = keyedHashAlgorithm;
             var signer = KeyedHashAlgorithm.Create(keyedHashAlgorithm.ToString());
             signer.Key = key;
             this.signer = signer;
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="NerdyMishka.Security.Cryptography.HMACBlockStream"/>
+        /// Initializes a new instance of the
+        /// <see cref="NerdyMishka.Security.Cryptography.HMACBlockStream"/> class.
         /// </summary>
         /// <param name="innerStream">The stream that will be read or written to.</param>
-        /// <param name="write">If true, the stream will be written to; othewise, read from.</param>
+        /// <param name="write">If true, the stream will be written to; otherwise, read from.</param>
         /// <param name="encoding">The encoding that the stream should use.</param>
         /// <param name="hashAlgorithm">The hash algorithm used to create an authentication code.</param>
         public HMACBlockStream(Stream innerStream, bool write, Encoding encoding, HashAlgorithmName hashAlgorithm)
         {
-            if (innerStream == null)
+            if (innerStream is null)
                 throw new ArgumentNullException(nameof(innerStream));
 
-            if (encoding == null)
+            if (encoding is null)
                 throw new ArgumentNullException(nameof(encoding));
 
             this.innerStream = innerStream;
@@ -101,27 +101,27 @@ namespace NerdyMishka.Security.Cryptography
         }
 
         /// <summary>
-        /// Gets if consumers of this stream can read from it.
+        /// Gets a value indicating whether consumers of this stream can read from it.
         /// </summary>
         public override bool CanRead => this.writer == null;
 
         /// <summary>
-        /// Gets if the consumers of this stream can seek. Always False.
+        /// Gets a value indicating whether consumers of this stream can seek. Always False.
         /// </summary>
         public override bool CanSeek => false;
 
         /// <summary>
-        /// Gets if consumers of this stream can write to it.
+        /// Gets a value indicating whether consumers of this stream can write to it.
         /// </summary>
         public override bool CanWrite => this.writer != null;
 
         /// <summary>
-        /// Gets
+        /// Gets the length of the stream.
         /// </summary>
         public override long Length => this.innerStream.Length;
 
         /// <summary>
-        /// Gets the current position of the stream.
+        /// Gets or sets the current position of the stream.
         /// </summary>
         public override long Position
         {
@@ -149,7 +149,7 @@ namespace NerdyMishka.Security.Cryptography
         /// Reads a give number of bytes (<paramref name="count"/>) starting at the given <paramref name="offset"/>.
         /// </summary>
         /// <param name="buffer">The buffer that filled with bytes.</param>
-        /// <param name="offset">The offset from the position of the stream</param>
+        /// <param name="offset">The offset from the position of the stream.</param>
         /// <param name="count">The number of bytes to read to the buffer.</param>
         /// <returns>The number of bytes read.</returns>
         public override int Read(byte[] buffer, int offset, int count)
@@ -186,18 +186,18 @@ namespace NerdyMishka.Security.Cryptography
         /// <summary>
         /// Not supported.
         /// </summary>
-        /// <param name="offset"> Not supported.</param>
-        /// <param name="origin"> Not supported.</param>
-        /// <returns></returns>
+        /// <param name="offset"> The offset.</param>
+        /// <param name="origin"> The origin.</param>
+        /// <returns>a long.</returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotSupportedException();
         }
 
         /// <summary>
-        /// Not supported
+        /// Not supported.
         /// </summary>
-        /// <param name="value"> Not supported.</param>
+        /// <param name="value"> The length.</param>
         public override void SetLength(long value)
         {
             throw new NotSupportedException();
@@ -231,7 +231,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <summary>
         /// Disposes the object.
         /// </summary>
-        /// <param name="disposing">Determines if the object is disposed manually or gced.</param>
+        /// <param name="disposing">Determines if the object is disposed manually or garbage collected.</param>
         [SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types", Justification = "By Design")]
         protected override void Dispose(bool disposing)
         {

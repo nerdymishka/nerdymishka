@@ -8,7 +8,6 @@ namespace NerdyMishka.Extensions.Data.Tests
         [Fact]
         public void Test1()
         {
-
         }
     }
 }

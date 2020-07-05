@@ -94,7 +94,7 @@ namespace NerdyMishka.Util.Binary
             Check.NotNullOrEmpty(nameof(value), value);
             Check.Count(nameof(value), value, 1);
 
-            return value[0] == 1 ? true : false;
+            return value[0] == 1;
         }
 
         public static bool ToBoolean(byte[] value, int startIndex)
@@ -102,7 +102,7 @@ namespace NerdyMishka.Util.Binary
             Check.NotNullOrEmpty(nameof(value), value);
             Check.Slice(nameof(value), value, startIndex, 1);
 
-            return value[startIndex] == 1 ? true : false;
+            return value[startIndex] == 1;
         }
 
         public static char ToChar(byte[] value)

@@ -8,3 +8,5 @@
     "Design", "SA1101: Prefs local calls with this", Justification = "ByDesign")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Design", "CA1707: Remove underscores", Justification = "ByDesign")]
+
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("", "IDE0044:", Justification = "By Design")]

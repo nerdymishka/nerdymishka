@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -18,6 +19,7 @@ namespace NerdyMishka.Text.DotEnv
             }
         }
 
+        [SuppressMessage("", "IDE0039:", Justification = "By Design")]
         public static IReadOnlyList<Token> Tokenize(TextReader reader)
         {
             if (reader is null)

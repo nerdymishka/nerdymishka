@@ -8,19 +8,26 @@ namespace NerdyMishka.Security.Cryptography
     /// <summary>
     /// The Salsa20 implementation.
     /// </summary>
-    /// <remarks>http://cr.yp.to/snuffle/spec.pdf</remarks>
+    /// <remarks>http://cr.yp.to/snuffle/spec.pdf .</remarks>
     internal class Salsa20Transform : ICryptoTransform
     {
         // https://dotnetfiddle.net/Bh4ijW
         private static readonly uint[] Sigma = new uint[] { 0x61707865, 0x3320646E, 0x79622D32, 0x6B206574 };
         private static readonly uint[] Tau = new uint[] { 0x61707865, 0x3120646E, 0x79622D36, 0x6B206574 };
+
+        private readonly int rounds = 10;
+
+        private readonly bool skipXor = false;
+
+        private readonly byte[] bitSet = new byte[64];
+
         private uint[] state;
+
         private uint[] stateBuffer = new uint[16];
-        private int rounds = 10;
+
         private bool isDisposed = false;
-        private bool skipXor = false;
+
         private int bytesRemaining = 0;
-        private byte[] bitSet = new byte[64];
 
         public Salsa20Transform(byte[] key, byte[] iv, int rounds, bool skipXor)
         {

@@ -6,10 +6,10 @@ namespace NerdyMishka.Security.Cryptography
     {
         private static readonly KeySizes[] ChaChaLegalBlockSizes = new[] { new KeySizes(64, 64, 0) };
         private static readonly KeySizes[] ChaChaLegalKeySizes = new[] { new KeySizes(128, 256, 128) };
-        private NerdyRandomNumberGenerator rng;
+        private readonly NerdyRandomNumberGenerator rng;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Salsa20"/>
+        ///  Initializes a new instance of the <see cref="ChaCha20"/> class.
         /// </summary>
         protected ChaCha20()
         {
@@ -51,9 +51,9 @@ namespace NerdyMishka.Security.Cryptography
 #pragma warning disable CS0109
 
         /// <summary>
-        /// Creates a new instance of <see cref="NerdyMishka.Security.Cryptography.Salsa20" />
+        /// Creates a new instance of <see cref="NerdyMishka.Security.Cryptography.ChaCha20" /> class.
         /// </summary>
-        /// <returns>A new instance of <see cref="Salsa20"/></returns>
+        /// <returns>A new instance of <see cref="ChaCha20"/>.</returns>
         public static new ChaCha20 Create()
         {
             return new ChaCha20();

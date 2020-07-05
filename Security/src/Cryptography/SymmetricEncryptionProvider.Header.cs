@@ -259,8 +259,10 @@ namespace NerdyMishka.Security.Cryptography
             // 4. iv
             // 5. symmetricKey (optional)
             // 6. hash
-            var header = new HeaderV1();
-            header.MetaDataSize = metadata.Length;
+            var header = new HeaderV1
+            {
+                MetaDataSize = metadata.Length,
+            };
 
             bool privateKeyEmpty = privateKey == null || privateKey.IsEmpty;
             bool symmetricKeyEmpty = symmetricKey == null || symmetricKey.IsEmpty;

@@ -4,6 +4,7 @@
 using System;
 using System.Buffers;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using HashAlgorithmName = NerdyMishka.Security.Cryptography.HashAlgorithmName;
@@ -245,6 +246,7 @@ namespace NerdyMishka.Security.Cryptography
             return password;
         }
 
+        [SuppressMessage("", "IDE0060", Justification = "Required")]
         public byte[] CryptDeriveKey(string algname, string alghashname, int keySize, byte[] rgbIV)
         {
             // If this were to be implemented here, CAPI would need to be used (not CNG) because of
@@ -298,6 +300,7 @@ namespace NerdyMishka.Security.Cryptography
             }
         }
 
+        /*
         private static void FillSpan(Span<byte> data)
         {
             if (data.Length > 0)
@@ -309,7 +312,7 @@ namespace NerdyMishka.Security.Cryptography
                     bytes.CopyTo(data);
                 }
             }
-        }
+        }*/
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA5350", Justification = "HMACSHA1 is needed for compat. (https://github.com/dotnet/corefx/issues/9438)")]
         private HMAC OpenHmac()

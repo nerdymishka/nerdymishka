@@ -5,7 +5,10 @@ namespace NerdyMishka.Security.Cryptography
     /// </summary>
     public enum MemoryProtectionActionType
     {
+        /// <summary>Encrypt data</summary>
         Encrypt,
+
+        /// <summary>Decrypt data.</summary>
         Decrypt,
     }
 }

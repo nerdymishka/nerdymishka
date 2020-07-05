@@ -34,15 +34,15 @@ namespace NerdyMishka.Security.Cryptography
     /// </remarks>
     public partial class SymmetricEncryptionProvider : ISymmetricEncryptionProvider, IDisposable
     {
+        private readonly ISymmetricEncryptionProviderOptions options;
+
+        private readonly bool internallyControlled = false;
+
         private SymmetricAlgorithm algorithm;
 
         private KeyedHashAlgorithm signingAlgorithm;
 
-        private ISymmetricEncryptionProviderOptions options;
-
         private bool isDisposed = false;
-
-        private bool internallyControlled = false;
 
         public SymmetricEncryptionProvider(ISymmetricEncryptionProviderOptions options = null)
         {

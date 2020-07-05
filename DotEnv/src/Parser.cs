@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NerdyMishka.Text.DotEnv
 {
@@ -15,27 +16,59 @@ namespace NerdyMishka.Text.DotEnv
 
         public enum ValueState : int
         {
+            /// <summary>
+            /// None.
+            /// </summary>
             None = 0,
 
+            /// <summary>
+            /// Single Quote.
+            /// </summary>
             SingleQuote = 1,
 
+            /// <summary>
+            /// Double Quote.
+            /// </summary>
             DoubleQuote = 2,
 
+            /// <summary>
+            /// JSON.
+            /// </summary>
             Json = 3,
         }
 
         public enum ParserState : int
         {
+            /// <summary>
+            /// None.
+            /// </summary>
             None = 0,
 
+            /// <summary>
+            /// Comment.
+            /// </summary>
             Comment = 1,
 
+            /// <summary>
+            /// Key.
+            /// </summary>
+            /// <param name="tokens"></param>
+            /// <returns></returns>
             Key = 2,
 
+            /// <summary>
+            ///  Value.
+            /// </summary>
             Value = 3,
 
+            /// <summary>
+            ///  Multi-line
+            /// </summary>
             Multiline = 4,
 
+            /// <summary>
+            /// End
+            /// </summary>
             End = 400,
         }
 
@@ -183,24 +216,25 @@ namespace NerdyMishka.Text.DotEnv
             return ParserState.None;
         }
 
-        private ParserState VisitJson(Token token)
+        [SuppressMessage("", "IDE0059:", Justification = "By Design")]
+        private ParserState VisitJson()
         {
             Token lastToken = null;
             while (this.stream.Consume())
             {
-                var current = this.stream.Current;
-                if (current.Kind == TokenKind.JsonEnd &&
-                    lastToken.Kind == TokenKind.NewLine)
+                var currentToken = this.stream.Current;
+                if (currentToken.Kind == TokenKind.JsonEnd &&
+                    lastToken != null && lastToken.Kind == TokenKind.NewLine)
                 {
                     this.stream.Consume();
                     var value = this.stream.GetWord();
                     this.result.Add(this.lastWord, value);
 
-                    token = this.stream.Current;
+                    currentToken = this.stream.Current;
                     while (this.stream.Consume())
                     {
-                        token = this.stream.Current;
-                        if (token.Kind == TokenKind.NewLine)
+                        currentToken = this.stream.Current;
+                        if (currentToken.Kind == TokenKind.NewLine)
                         {
                             this.valueState = ValueState.None;
                             return ParserState.None;
@@ -210,7 +244,7 @@ namespace NerdyMishka.Text.DotEnv
                     return ParserState.End;
                 }
 
-                lastToken = current;
+                lastToken = currentToken;
             }
 
             return ParserState.End;
@@ -225,7 +259,7 @@ namespace NerdyMishka.Text.DotEnv
                 case ValueState.SingleQuote:
                     return this.VisitSingleQuote(token);
                 case ValueState.Json:
-                    return this.VisitJson(token);
+                    return this.VisitJson();
                 default:
                     throw new NotSupportedException($"unsupported value state {this.valueState}");
             }
@@ -255,7 +289,7 @@ namespace NerdyMishka.Text.DotEnv
                         token = this.stream.Current;
                         break;
                     case TokenKind.JsonStart:
-                        return this.VisitJson(token);
+                        return this.VisitJson();
                 }
             }
 

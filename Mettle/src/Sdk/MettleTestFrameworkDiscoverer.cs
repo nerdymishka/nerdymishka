@@ -208,9 +208,10 @@ namespace Mettle.Xunit.Sdk
                 var methodName = testCase.TestMethod?.Method?.Name;
                 if (className != null && methodName != null && (xunitTestCase.TestMethodArguments == null || xunitTestCase.TestMethodArguments.Length == 0))
                 {
+                    var name = testCase.TestMethod.TestClass.TestCollection.UniqueID.ToString("N");
                     return $":F:{className.Replace(":", "::")}:{methodName.Replace(":", "::")}" +
                         $":{(int)xunitTestCase.DefaultMethodDisplay}:{(int)xunitTestCase.DefaultMethodDisplayOptions}" +
-                        $":{testCase.TestMethod.TestClass.TestCollection.UniqueID.ToString("N")}";
+                        $":{name}";
                 }
             }
 

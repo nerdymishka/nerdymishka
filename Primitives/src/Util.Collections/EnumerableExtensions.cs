@@ -1,12 +1,17 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NerdyMishka.Util.Collections
 {
+    [SuppressMessage("Microsoft.Design", "CA1062:", Justification = "Required")]
     public static class EnumerableExtensions
     {
         public static bool EqualTo<T>(this IEnumerable<T> left, IEnumerable<T> right, IComparer<T> comparer)
         {
+            if (left == null && right == null)
+                return true;
+
             if (left == null && right != null)
                 return false;
 
@@ -90,12 +95,10 @@ namespace NerdyMishka.Util.Collections
                 var lValue = leftEnumerator.Current;
                 var rValue = rightEnumerator.Current;
 
-                var lEquatable = lValue as IEquatable<T>;
-                if (lEquatable != null && !lEquatable.Equals(rValue))
+                if (lValue is IEquatable<T> lEquatable && !lEquatable.Equals(rValue))
                     return false;
 
-                var lComparable = lValue as IComparable<T>;
-                if (lComparable != null && lComparable.CompareTo(rValue) != 0)
+                if (lValue is IComparable<T> lComparable && lComparable.CompareTo(rValue) != 0)
                     return false;
 
                 if (!lValue.Equals(rValue))

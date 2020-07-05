@@ -16,7 +16,7 @@ namespace NerdyMishka.Util.IO
             const int interval = 1024;
             while (l >= interval && order < (sizes.Length - 1))
             {
-                l = l / interval;
+                l /= interval;
                 order++;
                 if (format != ByteMeasurement.Auto && order == (int)format)
                 {

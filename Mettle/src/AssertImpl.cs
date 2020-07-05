@@ -8,9 +8,9 @@ namespace Mettle
 {
     public class AssertImpl : IAssert
     {
-        private static IAssert s_assert = new AssertImpl();
+        private static readonly IAssert InnerAssert = new AssertImpl();
 
-        public static IAssert Current => s_assert;
+        public static IAssert Current => InnerAssert;
 
         public IAssert Ok(bool condition, string message = null)
         {

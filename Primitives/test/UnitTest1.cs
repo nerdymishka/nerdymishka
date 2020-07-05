@@ -8,7 +8,6 @@ namespace NerdyMishka.Primitives.Tests
         [Fact]
         public void Test1()
         {
-
         }
     }
 }

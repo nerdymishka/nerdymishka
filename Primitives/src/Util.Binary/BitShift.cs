@@ -6,11 +6,11 @@ namespace NerdyMishka.Util.Binary
     public static class BitShift
     {
         /// <summary>
-        /// Shifts the bits in a circular fashion
+        /// Shifts the bits in a circular fashion.
         /// </summary>
         /// <param name="value">The value to shift.</param>
-        /// <param name="r"></param>
-        /// <returns></returns>
+        /// <param name="r">The radix.</param>
+        /// <returns>The rotated value.</returns>
         [CLSCompliant(false)]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong RotateLeft64(ulong value, short r)

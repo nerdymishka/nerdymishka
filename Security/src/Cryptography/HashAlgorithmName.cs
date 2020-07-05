@@ -38,8 +38,8 @@ namespace NerdyMishka.Security.Cryptography
 
         public override bool Equals(object obj)
         {
-            if (obj is HashAlgorithmName)
-                return this.Equals((HashAlgorithmName)obj);
+            if (obj is HashAlgorithmName name)
+                return this.Equals(name);
 
             return false;
         }

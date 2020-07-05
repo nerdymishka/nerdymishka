@@ -15,7 +15,7 @@ public class StringExtensionsTests
     {
         // TODO: consider getting strings from different cultures
         var result = "iHazCats".Equals("IHAZCATS", true);
-        assert.Ok(result);
+        this.assert.Ok(result);
 
         result = "iHazCatz".Equals("IHAZCATS", true);
         assert.Ok(!result);

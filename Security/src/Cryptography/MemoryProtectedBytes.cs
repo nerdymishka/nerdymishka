@@ -128,7 +128,6 @@ namespace NerdyMishka.Security.Cryptography
 
             Array.Copy(decrypted, array, l);
             Array.Clear(decrypted, 0, decrypted.Length);
-            decrypted = null;
         }
 
         public void Dispose()
@@ -144,8 +143,8 @@ namespace NerdyMishka.Security.Cryptography
             if (other == null)
                 return false;
 
-            if (other is MemoryProtectedBytes)
-                return this.Equals((MemoryProtectedBytes)other);
+            if (other is MemoryProtectedBytes bytes)
+                return this.Equals(bytes);
 
             return false;
         }
@@ -283,6 +282,8 @@ namespace NerdyMishka.Security.Cryptography
                 this.Key = null;
                 this.IV = null; // reference in NonceFactory
             }
+
+            this.isDisposed = true;
         }
 
         private static byte[] Grow(byte[] binary, int blockSize = 16)

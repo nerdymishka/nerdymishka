@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Mettle;
 
 namespace Tests
 {
+    [SuppressMessage("", "IDE0052:", Justification = "To Show what is possible")]
     public class UnitTest
     {
         private readonly IAssert assert;

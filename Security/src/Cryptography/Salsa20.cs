@@ -12,10 +12,10 @@ namespace NerdyMishka.Security.Cryptography
     {
         private static readonly KeySizes[] SalsaLegalBlockSizes = new[] { new KeySizes(64, 64, 0) };
         private static readonly KeySizes[] SalsaLegalKeySizes = new[] { new KeySizes(128, 256, 128) };
-        private NerdyRandomNumberGenerator rng;
+        private readonly NerdyRandomNumberGenerator rng;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="Salsa20"/>
+        /// Initializes a new instance of the <see cref="Salsa20"/> class.
         /// </summary>
         protected Salsa20()
         {
@@ -58,14 +58,14 @@ namespace NerdyMishka.Security.Cryptography
 #pragma warning disable CS0109
 
         /// <summary>
-        /// Gets or sets whether or skip a XOR operation during the transform block.
+        /// Gets or sets a value indicating whether or skip a XOR operation during the transform block.
         /// </summary>
         internal bool SkipXor { get; set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="NerdyMishka.Security.Cryptography.Salsa20" />
+        /// Creates a new instance of the <see cref="Salsa20" /> class.
         /// </summary>
-        /// <returns>A new instance of <see cref="Salsa20"/></returns>
+        /// <returns>A new instance of the <see cref="Salsa20"/> class.</returns>
         public static new Salsa20 Create()
         {
             return new Salsa20();
