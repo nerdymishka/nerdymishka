@@ -8,7 +8,6 @@ namespace NerdyMishka.Windows.CredentialManager
         [Fact]
         public void Test1()
         {
-
         }
     }
 }
