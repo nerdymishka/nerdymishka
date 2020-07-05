@@ -1,11 +1,20 @@
 {
     "omnisharp.enableRoslynAnalyzers": true,
+    "editor.rulers": [80, 120],
+    "powershell.codeFormatting.preset": "Allman",
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
     "cSpell.words": [
         "Algo",
         "BSTR",
         "CAPI",
         "Catz",
         "DPAPI",
+        "HKCC",
+        "HKCR",
+        "HKCU",
+        "HKLM",
         "HMAC",
         "HMACSHA",
         "Herndon",
@@ -28,8 +37,5 @@
         "nuget",
         "unprotect",
         "woah"
-    ],
-    "powershell.codeFormatting.preset": "Allman",
-    "editor.formatOnSave": true,
-    "editor.formatOnType": true
+    ]
 }
