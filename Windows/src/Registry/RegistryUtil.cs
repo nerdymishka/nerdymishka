@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Windows;
 using Microsoft.Win32;
 
@@ -345,6 +346,7 @@ namespace NerdyMishka.Windows.Registry
             }
         }
 
+        [SuppressMessage("", "SA1025:", Justification = "pragma")]
         public static RegistryKey OpenSubKey(RegistryKey hive, string value)
         {
             if (hive is null)
@@ -354,12 +356,12 @@ namespace NerdyMishka.Windows.Registry
                 throw new ArgumentNullException(nameof(value));
 
 #if NETSTANDARD2_0
-            return hive.OpenSubKey(value.Replace("\\", "/"));
-        }
+            var key = hive.OpenSubKey(value.Replace("\\", "/"));
 #else
-            return hive.OpenSubKey(value.Replace("\\", "/", StringComparison.OrdinalIgnoreCase));
-        }
+            var key =  hive.OpenSubKey(value.Replace("\\", "/", StringComparison.OrdinalIgnoreCase));
 #endif
+            return key;
+        }
 
         public static RegistryKey OpenSubKey(string value)
         {
