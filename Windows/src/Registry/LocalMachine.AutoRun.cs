@@ -7,7 +7,6 @@ namespace NerdyMishka.Windows.Registry
     /// </summary>
     public static partial class LocalMachine
     {
-
         public static void AddAutoRunEntry(
             string name,
             string value,
