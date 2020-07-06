@@ -22,11 +22,7 @@ namespace NerdyMishka.Api.KeePass
         }
 
         public static KeePassIdentifier Empty => new KeePassIdentifier(
-            new byte[]
-            {
-                0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-                0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
-            });
+            new byte[16]);
 
         public bool IsEmpty
         {
