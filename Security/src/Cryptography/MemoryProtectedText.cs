@@ -50,7 +50,7 @@ namespace NerdyMishka.Security.Cryptography
             this.Length = chars.Length;
         }
 
-        public MemoryProtectedText(byte[] bytes, Encoding encoding = null, bool encrypt = true)
+        public MemoryProtectedText(ReadOnlySpan<byte> bytes, Encoding encoding = null, bool encrypt = true)
             : base(bytes, encrypt)
         {
             this.encoding = encoding ?? Utf8Options.NoBom;
@@ -149,7 +149,7 @@ namespace NerdyMishka.Security.Cryptography
             if (this.text != null)
                 return this.text;
 
-            var decrypted = this.Decrypt();
+            var decrypted = this.Decrypt().ToArray();
             try
             {
                 encoding = encoding ?? this.GetEncoding();
@@ -196,7 +196,7 @@ namespace NerdyMishka.Security.Cryptography
                 return;
             }
 
-            var decrypted = this.Decrypt();
+            var decrypted = this.Decrypt().ToArray();
             var chars = this.GetEncoding().GetChars(decrypted);
             chars.CopyTo(array, 0);
             Array.Clear(decrypted, 0, decrypted.Length);

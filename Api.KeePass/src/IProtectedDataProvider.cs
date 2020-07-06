@@ -6,8 +6,8 @@ namespace NerdyMishka.Api.KeePass
 {
     public interface IProtectedDataProvider
     {
-        byte[] ProtectData(byte[] userData, byte[] optionalEntropy, bool isLocalMachine = false);
+        ReadOnlySpan<byte> ProtectData(ReadOnlySpan<byte> userData, ReadOnlySpan<byte> optionalEntropy, bool isLocalMachine = false);
 
-        byte[] UnprotectData(byte[] userData, byte[] optionalEntropy, bool isLocalMachine = false);
+        ReadOnlySpan<byte> UnprotectData(ReadOnlySpan<byte> userData, ReadOnlySpan<byte> optionalEntropy, bool isLocalMachine = false);
     }
 }

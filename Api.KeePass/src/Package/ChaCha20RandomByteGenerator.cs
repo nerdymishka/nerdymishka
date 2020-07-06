@@ -11,16 +11,16 @@ namespace NerdyMishka.Api.KeePass.Package
 
         public int Id => 3;
 
-        public void Initialize(byte[] key)
+        public void Initialize(ReadOnlySpan<byte> key)
         {
             using (var cipher = ChaCha20.Create())
             {
                 cipher.SkipXor = true;
                 cipher.Rounds = ChaCha20Round.Twelve;
                 var iv = new byte[8] { 0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A };
-                this.transform = cipher.CreateDecryptor(key.ToSHA256Hash(), iv);
-
-                key.Clear();
+                var keyBytes = key.ToSHA256Hash().ToArray();
+                this.transform = cipher.CreateDecryptor(keyBytes, iv);
+                keyBytes.Clear();
                 iv.Clear();
             }
         }

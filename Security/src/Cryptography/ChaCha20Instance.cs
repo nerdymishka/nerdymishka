@@ -21,7 +21,7 @@ namespace NerdyMishka.Security.Cryptography
                     s_instance.CreateEncryptor(key, iv) :
                     s_instance.CreateEncryptor(key, iv);
 
-                return transform.TransformFinalBlock(bytes, 0, bytes.Length);
+                return transform.TransformFinalBlock(bytes.ToArray(), 0, bytes.Length);
             };
         }
 

@@ -35,22 +35,21 @@ namespace NerdyMishka.Security.Cryptography
             this.IV = NonceFactory.Generate();
         }
 
-        public MemoryProtectedBytes(byte[] bytes, byte[] key, byte[] iv, bool encrypt = true)
+        public MemoryProtectedBytes(
+            ReadOnlySpan<byte> bytes,
+            ReadOnlySpan<byte> key,
+            ReadOnlySpan<byte> iv,
+            bool encrypt = true)
         {
-            Check.NotNull(nameof(bytes), bytes);
-            Check.NotNull(nameof(key), key);
-            Check.NotNull(nameof(iv), iv);
-
             this.key = new byte[key.Length];
             this.iv = new byte[iv.Length];
-            Array.Copy(key, this.key, key.Length);
-            Array.Copy(iv, this.iv, iv.Length);
+            key.CopyTo(this.key);
+            iv.CopyTo(this.iv);
             this.Init(bytes, encrypt);
         }
 
-        public MemoryProtectedBytes(byte[] bytes, bool encrypt = true)
+        public MemoryProtectedBytes(ReadOnlySpan<byte> bytes, bool encrypt = true)
         {
-            Check.NotNull(nameof(bytes), bytes);
             this.Init(bytes, encrypt);
         }
 
@@ -126,8 +125,7 @@ namespace NerdyMishka.Security.Cryptography
             var decrypted = this.Decrypt(this.data);
             var l = Math.Min(this.Length, array.Length);
 
-            Array.Copy(decrypted, array, l);
-            Array.Clear(decrypted, 0, decrypted.Length);
+            decrypted.CopyTo(array);
         }
 
         public void Dispose()
@@ -192,20 +190,20 @@ namespace NerdyMishka.Security.Cryptography
             return copy;
         }
 
-        protected virtual byte[] Encrypt(byte[] bytes)
+        protected virtual ReadOnlySpan<byte> Encrypt(ReadOnlySpan<byte> bytes)
         {
-            if (!this.IsProtected || bytes == null || bytes.Length == 0)
+            if (!this.IsProtected || bytes.Length == 0)
                 return bytes;
 
             return s_defaultAction(bytes, this, MemoryProtectionActionType.Encrypt);
         }
 
-        protected virtual byte[] Decrypt()
+        protected virtual ReadOnlySpan<byte> Decrypt()
         {
-            return this.Decrypt(this.data);
+            return this.Decrypt(this.data.AsSpan());
         }
 
-        protected virtual byte[] Decrypt(byte[] bytes)
+        protected virtual ReadOnlySpan<byte> Decrypt(ReadOnlySpan<byte> bytes)
         {
             if (!this.IsProtected || bytes == null || bytes.Length == 0)
                 return bytes;
@@ -213,20 +211,27 @@ namespace NerdyMishka.Security.Cryptography
             return s_defaultAction(bytes, this, MemoryProtectionActionType.Decrypt);
         }
 
-        protected virtual void UpdateHash(byte[] bytes)
+        protected virtual void UpdateHash(ReadOnlySpan<byte> bytes)
         {
-            Check.NotNull(nameof(bytes), bytes);
-
             using (var sha = SHA256.Create())
             {
-                this.hash = sha.ComputeHash(bytes);
+#if NETSTANDARD2_0
+                this.hash = sha.ComputeHash(bytes.ToArray());
+#else
+                var size = sha.HashSize >> 3;
+                Span<byte> uiSpan = stackalloc byte[64];
+                uiSpan = uiSpan.Slice(0, size);
+                if(!sha.TryComputeHash(bytes, uiSpan, out int bytesWritten)|| bytesWritten != size)
+                {
+                    throw new CryptographicException();
+                }
+                this.hash = uiSpan.ToArray();
+#endif
             }
         }
 
-        protected virtual void Update(byte[] decryptedBytes)
+        protected virtual void Update(ReadOnlySpan<byte> decryptedBytes)
         {
-            Check.NotNull(nameof(decryptedBytes), decryptedBytes);
-
             this.Length = decryptedBytes.Length;
             this.UpdateHash(decryptedBytes);
 
@@ -234,16 +239,14 @@ namespace NerdyMishka.Security.Cryptography
             // DPAPI. DPAPI requires blocks of 16.
             if (s_blockGrowth > 0)
             {
-                var bytes = Grow(decryptedBytes, s_blockGrowth);
-                this.data = this.Encrypt(bytes);
-                Array.Clear(bytes, 0, bytes.Length);
-                return;
+                decryptedBytes = Grow(decryptedBytes, s_blockGrowth);
             }
 
-            this.data = this.Encrypt(decryptedBytes);
+            this.data = this.Encrypt(decryptedBytes)
+                            .ToArray();
         }
 
-        protected void Init(byte[] bytes, bool encrypt = true)
+        protected void Init(ReadOnlySpan<byte> bytes, bool encrypt = true)
         {
             if (this.iv == null)
                 this.iv = NonceFactory.Generate();
@@ -286,12 +289,12 @@ namespace NerdyMishka.Security.Cryptography
             this.isDisposed = true;
         }
 
-        private static byte[] Grow(byte[] binary, int blockSize = 16)
+        private static ReadOnlySpan<byte> Grow(ReadOnlySpan<byte> binary, int blockSize = 16)
         {
             return Grow(binary, binary.Length, blockSize);
         }
 
-        private static byte[] Grow(byte[] binary, int length, int blockSize = 16)
+        private static ReadOnlySpan<byte> Grow(ReadOnlySpan<byte> binary, int length, int blockSize = 16)
         {
             int blocks = binary.Length / blockSize;
             int size = blocks * blockSize;
@@ -304,9 +307,9 @@ namespace NerdyMishka.Security.Cryptography
                 }
             }
 
-            byte[] result = new byte[blocks * blockSize];
-            Array.Copy(binary, result, binary.Length);
-            return result;
+            Span<byte> span = new byte[blocks * blockSize];
+            binary.CopyTo(span);
+            return span;
         }
     }
 }

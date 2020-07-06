@@ -11,16 +11,17 @@ namespace NerdyMishka.Api.KeePass.Package
 
         public int Id => 2;
 
-        public void Initialize(byte[] key)
+        public void Initialize(ReadOnlySpan<byte> key)
         {
             using (var cipher = Salsa20.Create())
             {
                 cipher.SkipXor = true;
                 cipher.Rounds = Salsa20Round.Ten;
                 var iv = new byte[8] { 0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A };
-                this.transform = cipher.CreateDecryptor(key.ToSHA256Hash(), iv);
+                var keyBytes = key.ToSHA256Hash().ToArray();
+                this.transform = cipher.CreateEncryptor(keyBytes, iv);
 
-                key.Clear();
+                keyBytes.Clear();
                 iv.Clear();
             }
         }
