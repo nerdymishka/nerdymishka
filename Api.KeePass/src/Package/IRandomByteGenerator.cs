@@ -2,7 +2,7 @@ using System;
 
 namespace NerdyMishka.Api.KeePass.Package
 {
-    public interface IRandomByteGeneratorEngine
+    public interface IRandomByteGenerator
     {
         int Id { get; }
 

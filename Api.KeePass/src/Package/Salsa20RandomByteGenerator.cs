@@ -5,7 +5,7 @@ using NerdyMishka.Util.Arrays;
 
 namespace NerdyMishka.Api.KeePass.Package
 {
-    public class Salsa20RandomByteGenerator : IRandomByteGeneratorEngine
+    public class Salsa20RandomByteGenerator : IRandomByteGenerator
     {
         private ICryptoTransform transform;
 

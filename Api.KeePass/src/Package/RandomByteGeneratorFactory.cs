@@ -15,10 +15,10 @@ namespace NerdyMishka.Api.KeePass.Package
             typeof(ChaCha20RandomByteGenerator),
         };
 
-        public static IRandomByteGeneratorEngine GetGenerator(int id)
+        public static IRandomByteGenerator GetGenerator(int id)
         {
             var type = Engines[id];
-            return (IRandomByteGeneratorEngine)Activator.CreateInstance(type);
+            return (IRandomByteGenerator)Activator.CreateInstance(type);
         }
     }
 }

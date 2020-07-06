@@ -84,6 +84,18 @@ namespace NerdyMishka.Api.KeePass
             }
         }
 
+        public byte[] ToArray()
+        {
+            var bytes = new byte[this.uuid.Length];
+            Array.Copy(this.uuid, bytes, this.uuid.Length);
+            return bytes;
+        }
+
+        public ReadOnlySpan<byte> ToReadOnlySpan()
+        {
+            return this.uuid;
+        }
+
         public override string ToString()
         {
             return Convert.ToBase64String(this.uuid);

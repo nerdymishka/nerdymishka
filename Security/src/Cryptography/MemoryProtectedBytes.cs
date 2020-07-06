@@ -221,10 +221,11 @@ namespace NerdyMishka.Security.Cryptography
                 var size = sha.HashSize >> 3;
                 Span<byte> uiSpan = stackalloc byte[64];
                 uiSpan = uiSpan.Slice(0, size);
-                if(!sha.TryComputeHash(bytes, uiSpan, out int bytesWritten)|| bytesWritten != size)
+                if (!sha.TryComputeHash(bytes, uiSpan, out int bytesWritten) || bytesWritten != size)
                 {
                     throw new CryptographicException();
                 }
+
                 this.hash = uiSpan.ToArray();
 #endif
             }
