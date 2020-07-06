@@ -18,6 +18,8 @@ namespace NerdyMishka.Api.KeePass
 
         string UserName { get; set; }
 
+        IKeePassPassword Password { get; set; }
+
         string Notes { get; set; }
 
         IList<string> Tags { get; }

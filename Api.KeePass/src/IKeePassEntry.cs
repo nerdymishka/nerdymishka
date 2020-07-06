@@ -14,6 +14,8 @@ namespace NerdyMishka.Api.KeePass
     {
         IKeePassEntryFields Fields { get; }
 
+        IKeePassPassword Password { get; set; }
+
         string ForegroundColor { get; set; }
 
         string BackgroundColor { get; set; }
