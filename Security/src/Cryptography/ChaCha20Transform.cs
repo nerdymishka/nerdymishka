@@ -18,6 +18,8 @@ namespace NerdyMishka.Security.Cryptography
 
         private readonly int rounds;
 
+        private readonly bool skipXor;
+
         private uint[] state;
 
         private uint[] stateBuffer = new uint[16];
@@ -28,8 +30,9 @@ namespace NerdyMishka.Security.Cryptography
 
         private byte[] bitSet = new byte[64];
 
-        public ChaCha20Transform(byte[] key, byte[] iv, ChaCha20Round rounds, int counter = 0)
+        public ChaCha20Transform(byte[] key, byte[] iv, ChaCha20Round rounds, bool skipXor = false, int counter = 0)
         {
+            this.skipXor = skipXor;
             this.rounds = (int)rounds;
             this.state = CreateState(key, iv, counter);
         }
@@ -63,8 +66,15 @@ namespace NerdyMishka.Security.Cryptography
 
                 var length = Math.Min(this.bytesRemaining, inputCount);
 
-                for (int i = 0; i < length; i++)
-                    outputBuffer[outputOffset + i] = (byte)(inputBuffer[inputOffset + i] ^ this.bitSet[i]);
+                if (this.skipXor)
+                {
+                    Array.Copy(this.bitSet, inputOffset, outputBuffer, outputOffset, length);
+                }
+                else
+                {
+                    for (int i = 0; i < length; i++)
+                        outputBuffer[outputOffset + i] = (byte)(inputBuffer[inputOffset + i] ^ this.bitSet[i]);
+                }
 
                 this.bytesRemaining -= length;
                 bytesTransformed += length;

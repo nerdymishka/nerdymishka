@@ -60,7 +60,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <summary>
         /// Gets or sets a value indicating whether or skip a XOR operation during the transform block.
         /// </summary>
-        internal bool SkipXor { get; set; }
+        public bool SkipXor { get; set; }
 
         /// <summary>
         /// Creates a new instance of the <see cref="Salsa20" /> class.

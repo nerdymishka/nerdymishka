@@ -44,6 +44,8 @@ namespace NerdyMishka.Security.Cryptography
             }
         }
 
+        public bool SkipXor { get; set; } = false;
+
         public int Counter { get; set; } = 0;
 
         public ChaCha20Round Rounds { get; set; } = ChaCha20Round.Twenty;
@@ -68,7 +70,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <returns>A symmetric decryptor object.</returns>
         public override ICryptoTransform CreateDecryptor(byte[] rgbKey, byte[] rgbIV)
         {
-            return new ChaCha20Transform(rgbKey, rgbIV, this.Rounds, this.Counter);
+            return new ChaCha20Transform(rgbKey, rgbIV, this.Rounds, this.SkipXor, this.Counter);
         }
 
         /// <summary>
@@ -79,7 +81,7 @@ namespace NerdyMishka.Security.Cryptography
         /// <returns>A symmetric encryptor object.</returns>
         public override ICryptoTransform CreateEncryptor(byte[] rgbKey, byte[] rgbIV)
         {
-            return new ChaCha20Transform(rgbKey, rgbIV, this.Rounds, this.Counter);
+            return new ChaCha20Transform(rgbKey, rgbIV, this.Rounds, this.SkipXor, this.Counter);
         }
 
         public override void GenerateIV()
