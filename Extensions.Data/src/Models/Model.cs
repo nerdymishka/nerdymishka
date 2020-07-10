@@ -104,13 +104,23 @@ namespace NerdyMishka.Models
             }
         }
 
-        void IRevertibleChangeTracking.RejectChanges() => this.RejectChanges(true);
+        void IChangeTracking.AcceptChanges() => this.AcceptChanges(true);
+
+        void IRevertibleChangeTracking.RejectChanges()
+            => this.RejectChanges(true);
+
+        void IChangeTracker.AcceptChanges(bool includeDescendants)
+            => this.AcceptChanges(includeDescendants);
+
+        void IChangeTracker.RejectChanges(bool includeDescendants)
+            => this.RejectChanges(includeDescendants);
+
+        void IChangeTracker.UpdateOriginalValues(bool includeDescendants)
+            => this.UpdateOriginalValues(includeDescendants);
 
         void ISupportInitialize.BeginInit() => this.BeginInit();
 
         void ISupportInitialize.EndInit() => this.EndInit();
-
-        void IChangeTracking.AcceptChanges() => this.AcceptChanges(true);
 
         void IModel<T>.MarkDeleted(bool deleted) => this.isDeleted = deleted;
 
@@ -135,7 +145,38 @@ namespace NerdyMishka.Models
             this.isNew = false;
         }
 
-        protected void SetError(string propertyName, string message)
+        protected void UpdateOriginalValues(bool includeDescendants)
+        {
+            this.BeginInit();
+
+            ReflectionCache cache = ModelReflectionCache.Default;
+            var typeInfo = cache.GetOrAdd(this.GetType());
+            var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
+            this.originalValues.Clear();
+
+            if (includeDescendants)
+            {
+                foreach (var descendant in this.descendants.Values)
+                    descendant.UpdateOriginalValues(includeDescendants);
+            }
+
+            foreach (var propInfo in properties)
+            {
+                if (this.changedProperies.Contains(propInfo.Name))
+                {
+                    this.originalValues.Remove(propInfo.Name);
+                    this.originalValues.Add(propInfo.Name, propInfo.GetValue(this));
+                }
+
+                continue;
+            }
+
+            this.changedProperies.Clear();
+
+            this.EndInit();
+        }
+
+        protected virtual void SetError(string propertyName, string message)
         {
             if (this.errors == null)
                 this.errors = new Dictionary<string, string>();
@@ -146,13 +187,13 @@ namespace NerdyMishka.Models
                 this.errors[propertyName] = message;
         }
 
-        protected void ClearErrors()
+        protected virtual void ClearErrors()
         {
             if (this.errors != null)
                 this.errors.Clear();
         }
 
-        protected void Set<TValue>(string name, ref TValue oldValue, TValue newValue)
+        protected virtual void SetValue<TValue>(string name, ref TValue oldValue, TValue newValue)
         {
             if (newValue is IChangeTracker tracker)
             {
@@ -211,12 +252,9 @@ namespace NerdyMishka.Models
             return;
         }
 
-        protected void RejectChanges(bool includeDescendants)
+        protected virtual void RejectChanges(bool includeDescendants)
         {
             this.BeginInit();
-            ReflectionCache cache = ModelReflectionCache.Default;
-            var typeInfo = cache.GetOrAdd(this.GetType());
-            var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
 
             if (includeDescendants)
             {
@@ -224,32 +262,34 @@ namespace NerdyMishka.Models
                     descendant.RejectChanges();
             }
 
-            foreach (var propInfo in properties)
+            if (this.changedProperies.Count > 0)
             {
-                if (this.changedProperies.Contains(propInfo.Name))
+                ReflectionCache cache = ModelReflectionCache.Default;
+                var typeInfo = cache.GetOrAdd(this.GetType());
+                var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
+
+                foreach (var propInfo in properties)
                 {
-                    if (this.originalValues.TryGetValue(propInfo.Name, out object value))
+                    if (this.changedProperies.Contains(propInfo.Name))
                     {
-                        propInfo.SetValue(this, value);
+                        if (this.originalValues.TryGetValue(propInfo.Name, out object value))
+                        {
+                            propInfo.SetValue(this, value);
+                        }
                     }
+
+                    continue;
                 }
 
-                continue;
+                this.changedProperies.Clear();
             }
 
-            this.changedProperies.Clear();
             this.EndInit();
         }
 
-        protected void AcceptChanges(bool includeDescendants)
+        protected virtual void AcceptChanges(bool includeDescendants)
         {
             this.BeginInit();
-
-            // TODO: determine if type needs to be cached.
-            ReflectionCache cache = ModelReflectionCache.Default;
-            var typeInfo = cache.GetOrAdd(this.GetType());
-            var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
-            this.originalValues.Clear();
 
             if (includeDescendants)
             {
@@ -257,18 +297,27 @@ namespace NerdyMishka.Models
                     descendant.AcceptChanges();
             }
 
-            foreach (var propInfo in properties)
+            if (this.changedProperies.Count > 0)
             {
-                if (this.changedProperies.Contains(propInfo.Name))
+                // TODO: determine if type needs to be cached.
+                ReflectionCache cache = ModelReflectionCache.Default;
+                var typeInfo = cache.GetOrAdd(this.GetType());
+                var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
+
+                foreach (var propInfo in properties)
                 {
-                    this.originalValues.Remove(propInfo.Name);
-                    this.originalValues.Add(propInfo.Name, propInfo.GetValue(this));
+                    if (this.changedProperies.Contains(propInfo.Name))
+                    {
+                        this.originalValues.Remove(propInfo.Name);
+                        this.originalValues.Add(propInfo.Name, propInfo.GetValue(this));
+                    }
+
+                    continue;
                 }
 
-                continue;
+                this.changedProperies.Clear();
             }
 
-            this.changedProperies.Clear();
             this.isNew = false;
             this.EndInit();
         }

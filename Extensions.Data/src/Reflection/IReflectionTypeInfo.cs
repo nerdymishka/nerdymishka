@@ -6,7 +6,11 @@ namespace NerdyMishka.Reflection
 {
     public interface IReflectionTypeInfo : IReflectionMember
     {
+        bool IsGenericType { get; }
+
         IReadOnlyList<Type> Interfaces { get; }
+
+        IReadOnlyList<IReflectionField> Fields { get; }
 
         IReadOnlyList<IReflectionProperty> Properties { get; }
 
@@ -15,6 +19,12 @@ namespace NerdyMishka.Reflection
         IReadOnlyList<IReflectionConstructor> Constructors { get; }
 
         IReflectionTypeInfo LoadInterfaces();
+
+        IReflectionTypeInfo LoadFields(
+            bool includeStatic = false,
+            bool includeInherit = false);
+
+        IReflectionTypeInfo LoadFields(BindingFlags flags);
 
         IReflectionTypeInfo LoadProperties(
             bool includeStatic = false,

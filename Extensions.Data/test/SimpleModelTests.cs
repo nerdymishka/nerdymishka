@@ -116,13 +116,13 @@ namespace Tests
             public int? Id
             {
                 get => this.id;
-                set => this.Set(nameof(this.Id), ref this.id, value);
+                set => this.SetValue(nameof(this.Id), ref this.id, value);
             }
 
             public string Name
             {
                 get => this.name;
-                set => this.Set(nameof(this.Name), ref this.name, value);
+                set => this.SetValue(nameof(this.Name), ref this.name, value);
             }
         }
     }

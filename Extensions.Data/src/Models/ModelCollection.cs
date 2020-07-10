@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Linq;
 
 namespace NerdyMishka.Models
 {
@@ -19,10 +18,24 @@ namespace NerdyMishka.Models
 
         private bool ignoreChanges = false;
 
+        private IChangeTracker[] cache;
+
         public ModelCollection()
         {
             var changeTrackerInterface = typeof(T).GetInterface("IChangeTracker", true);
             this.descendantsImplementChangeTracker = changeTrackerInterface != null;
+        }
+
+        public ModelCollection(IEnumerable<T> values)
+            : this()
+        {
+            this.SetInitialValues(values);
+        }
+
+        public ModelCollection(Action<ModelCollection<T>> values)
+            : this()
+        {
+            this.SetInitialValues(values);
         }
 
         IReadOnlyList<T> IModelCollection<T>.Additions => this.additions;
@@ -57,11 +70,11 @@ namespace NerdyMishka.Models
             get
             {
                 if (!this.descendantsImplementChangeTracker)
-                {
                     return Array.Empty<IChangeTracker>();
-                }
 
-                // TODO: cache descendants
+                if (this.cache != null)
+                    return this.cache;
+
                 var set = new IChangeTracker[this.Count];
                 var i = 0;
                 foreach (IChangeTracker tracker in this)
@@ -70,7 +83,8 @@ namespace NerdyMishka.Models
                     i++;
                 }
 
-                return set;
+                this.cache = set;
+                return this.cache;
             }
         }
 
@@ -79,6 +93,31 @@ namespace NerdyMishka.Models
         void ISupportInitialize.EndInit() => this.EndInit();
 
         void IModelCollection<T>.SetInitialValues(IEnumerable<T> values)
+            => this.SetInitialValues(values);
+
+        void IModelCollection<T>.SetInitialValues(Action<IModelCollection<T>> action)
+            => this.SetInitialValues(action);
+
+        void IChangeTracking.AcceptChanges() => this.AcceptChanges(true);
+
+        void IRevertibleChangeTracking.RejectChanges()
+            => this.RejectChanges(true);
+
+        void IChangeTracker.AcceptChanges(bool includeDescendants)
+            => this.AcceptChanges(includeDescendants);
+
+        void IChangeTracker.RejectChanges(bool includeDescendants)
+            => this.RejectChanges(includeDescendants);
+
+        void IChangeTracker.UpdateOriginalValues(bool includeDescendants)
+            => this.UpdateOriginalValues(includeDescendants);
+
+        public IModelCollection<T> AsModel()
+        {
+            return this;
+        }
+
+        protected void SetInitialValues(IEnumerable<T> values)
         {
             if (values == null)
                 throw new ArgumentNullException(nameof(values));
@@ -95,7 +134,7 @@ namespace NerdyMishka.Models
             this.EndInit();
         }
 
-        void IModelCollection<T>.SetInitialValues(Action<IModelCollection<T>> action)
+        protected void SetInitialValues(Action<ModelCollection<T>> action)
         {
             if (action is null)
                 throw new ArgumentNullException(nameof(action));
@@ -111,16 +150,7 @@ namespace NerdyMishka.Models
             this.EndInit();
         }
 
-        void IChangeTracking.AcceptChanges() => this.AcceptChanges(true);
-
-        void IRevertibleChangeTracking.RejectChanges() => this.RejectChanges(true);
-
-        public IModelCollection<T> AsModel()
-        {
-            return this;
-        }
-
-        protected void AcceptChanges(bool includeDescendants)
+        protected virtual void AcceptChanges(bool includeDescendants)
         {
             this.BeginInit();
             this.additions.Clear();
@@ -134,10 +164,11 @@ namespace NerdyMishka.Models
                 }
             }
 
+            this.cache = null;
             this.EndInit();
         }
 
-        protected void RejectChanges(bool includeDescendants)
+        protected virtual void RejectChanges(bool includeDescendants)
         {
             this.BeginInit();
 
@@ -156,12 +187,30 @@ namespace NerdyMishka.Models
                     item.RejectChanges();
             }
 
+            this.cache = null;
             this.EndInit();
         }
 
         protected virtual void BeginInit() => this.ignoreChanges = true;
 
         protected virtual void EndInit() => this.ignoreChanges = false;
+
+        protected void UpdateOriginalValues(bool includeDescendants)
+        {
+            this.BeginInit();
+            this.additions.Clear();
+            this.removals.Clear();
+
+            if (includeDescendants && this.descendantsImplementChangeTracker)
+            {
+                foreach (IChangeTracker descendant in this)
+                    descendant.UpdateOriginalValues(includeDescendants);
+            }
+
+            this.cache = null;
+
+            this.EndInit();
+        }
 
         protected override void OnPropertyChanged(PropertyChangedEventArgs e)
         {
@@ -173,6 +222,7 @@ namespace NerdyMishka.Models
 
         protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
+            this.cache = null;
             if (this.ignoreChanges)
                 return;
 

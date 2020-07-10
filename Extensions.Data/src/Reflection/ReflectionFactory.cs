@@ -39,6 +39,14 @@ namespace NerdyMishka.Reflection
             return new ReflectionProperty(info, declaringType);
         }
 
+        public virtual IReflectionField CreateField(
+            FieldInfo info,
+            IReflectionTypeInfo declaringType = null)
+        {
+            // return new ReflectionProperty(info, declaringType);
+            return new ReflectionField(info, declaringType);
+        }
+
         public virtual IReflectionTypeInfo CreateType(Type type)
         {
             // return new ReflectionTypeInfo(type, this.cache);

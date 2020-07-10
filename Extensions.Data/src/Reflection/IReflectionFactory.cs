@@ -12,7 +12,13 @@ namespace NerdyMishka.Reflection
             ParameterInfo[] parameters = null,
             IReflectionTypeInfo declaringType = null);
 
-        IReflectionProperty CreateProperty(PropertyInfo info, IReflectionTypeInfo declaringType = null);
+        IReflectionProperty CreateProperty(
+            PropertyInfo info,
+            IReflectionTypeInfo declaringType = null);
+
+        IReflectionField CreateField(
+            FieldInfo info,
+            IReflectionTypeInfo declaringType = null);
 
         IReflectionTypeInfo CreateType(Type info);
 
