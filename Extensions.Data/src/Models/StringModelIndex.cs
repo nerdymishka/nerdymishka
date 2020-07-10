@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace NerdyMishka.Models
 {
@@ -29,8 +30,11 @@ namespace NerdyMishka.Models
             {
                 if (obj is null)
                     return 0;
-
+#if NETSTANDARD2_0
                 return obj.GetHashCode();
+#else
+                return obj.GetHashCode(StringComparison.OrdinalIgnoreCase);
+#endif
             }
         }
     }

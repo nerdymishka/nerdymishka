@@ -259,6 +259,7 @@ namespace NerdyMishka.Models
             }
 
             this.changedProperies.Clear();
+            this.isNew = false;
             this.EndInit();
         }
 

@@ -188,7 +188,10 @@ namespace NerdyMishka.Models
                     foreach (T item in e.NewItems)
                     {
                         if (this.removals.Contains(item))
+                        {
                             this.removals.Remove(item);
+                            continue;
+                        }
 
                         this.additions.Add(item);
                     }
@@ -209,16 +212,22 @@ namespace NerdyMishka.Models
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
+
                     foreach (T item in e.OldItems)
                     {
                         if (this.additions.Contains(item))
                             this.additions.Remove(item);
+                        else if (!this.removals.Contains(item))
+                            this.removals.Add(item);
                     }
 
                     foreach (T item in e.NewItems)
                     {
                         if (!this.additions.Contains(item))
                             this.additions.Add(item);
+
+                        if (this.removals.Contains(item))
+                            this.removals.Remove(item);
                     }
 
                     break;
