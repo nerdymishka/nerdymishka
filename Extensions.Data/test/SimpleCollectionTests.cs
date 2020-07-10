@@ -38,7 +38,8 @@ namespace Tests
             });
             Assert.True(model.Count == 2);
 
-            // true because the models were changed
+            // true because the child (descendant) models
+            // are changed after the constructor was called.
             Assert.True(model.IsChanged);
             Assert.True(model.Additions.Count == 0);
             Assert.True(model.Removals.Count == 0);
@@ -53,24 +54,28 @@ namespace Tests
 
             model.SetInitialValues(new[]
             {
-                Author.Create(m =>
+                new Author(m =>
                 {
                     m.Id = 12;
                 }),
-                Author.Create(m =>
+                new Author(m =>
                 {
                     m.Name = "ShakesSpear";
                 }),
             });
             Assert.True(model.Count == 2);
 
-            // true because the models were changed
+            // false because the models are created
+            // with initial state loaded and the
+            // collection is not modified.
             Assert.False(model.IsChanged);
             Assert.True(model.Additions.Count == 0);
             Assert.True(model.Removals.Count == 0);
             Assert.True(model.Descendants.Count == 2);
 
             set.RemoveAt(0);
+
+            // true because the collection is modified.
             Assert.True(model.IsChanged);
             Assert.True(model.Removals.Count == 1);
             Assert.True(model.Additions.Count == 0);
@@ -85,11 +90,11 @@ namespace Tests
 
             model.SetInitialValues(new[]
             {
-                Author.Create(m =>
+                new Author(m =>
                 {
                     m.Id = 12;
                 }),
-                Author.Create(m =>
+                new Author(m =>
                 {
                     m.Name = "ShakesSpear";
                 }),
@@ -109,6 +114,48 @@ namespace Tests
             Assert.True(model.Descendants.Count == 3);
         }
 
+        [Fact]
+        public void ReplaceValues()
+        {
+            var set = new ModelCollection<Author>();
+            var model = set.AsModel();
+
+            model.SetInitialValues(new[]
+            {
+                new Author(m =>
+                {
+                    m.Id = 12;
+                }),
+                new Author(m =>
+                {
+                    m.Name = "ShakesSpear";
+                }),
+            });
+
+            Assert.True(model.Count == 2);
+
+            // true because the models were changed
+            Assert.False(model.IsChanged);
+            Assert.True(model.Additions.Count == 0);
+            Assert.True(model.Removals.Count == 0);
+            Assert.True(model.Descendants.Count == 2);
+
+            var author3 = new Author((m) =>
+            {
+                m.Name = "Byron";
+            });
+
+            var old = set[1];
+            set[1] = author3;
+
+            Assert.True(model.IsChanged);
+            Assert.True(model.Additions.Count == 1);
+            Assert.True(model.Removals.Count == 1);
+            Assert.True(model.Descendants.Count == 2);
+            Assert.Collection(model.Additions, (item) => Assert.Equal(author3, item));
+            Assert.Collection(model.Removals, (item) => Assert.Equal(old, item));
+        }
+
         internal class Author : Model<Author>
         {
             private int? id;
@@ -123,6 +170,12 @@ namespace Tests
                 this.EndInit();
             }
 
+            public Author(Action<Author> setInitialValues)
+                : this()
+            {
+                this.SetInitialValues(setInitialValues);
+            }
+
             public int? Id
             {
                 get => this.id;
@@ -133,13 +186,6 @@ namespace Tests
             {
                 get => this.name;
                 set => this.Set("Name", ref this.name, value);
-            }
-
-            public static Author Create(Action<Author> action)
-            {
-                var author = new Author();
-                author.AsModel().SetInitialValues(action);
-                return author;
             }
         }
     }

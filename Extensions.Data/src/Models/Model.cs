@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using NerdyMishka.Reflection;
 
 namespace NerdyMishka.Models
 {
@@ -24,6 +25,15 @@ namespace NerdyMishka.Models
         private bool isNew = true;
 
         private bool isDeleted = false;
+
+        public Model()
+        {
+        }
+
+        public Model(Action<T> setInitialValues)
+        {
+            this.SetInitialValues(setInitialValues);
+        }
 
         protected event PropertyChangedEventHandler PropertyChanged;
 
@@ -106,6 +116,16 @@ namespace NerdyMishka.Models
 
         void IModel<T>.SetInitialValues(Action<T> action)
         {
+            this.SetInitialValues(action);
+        }
+
+        public IModel<T> AsModel()
+        {
+            return this;
+        }
+
+        protected void SetInitialValues(Action<T> action)
+        {
             if (action is null)
                 throw new ArgumentNullException(nameof(action));
 
@@ -113,11 +133,6 @@ namespace NerdyMishka.Models
             action((T)this);
             this.EndInit();
             this.isNew = false;
-        }
-
-        public IModel<T> AsModel()
-        {
-            return this;
         }
 
         protected void SetError(string propertyName, string message)
@@ -199,11 +214,9 @@ namespace NerdyMishka.Models
         protected void RejectChanges(bool includeDescendants)
         {
             this.BeginInit();
-            var properties = this.GetType().GetProperties(
-                BindingFlags.DeclaredOnly |
-                BindingFlags.Public |
-                BindingFlags.Instance)
-                .Where(o => o.CanRead && o.CanWrite);
+            ReflectionCache cache = ModelReflectionCache.Default;
+            var typeInfo = cache.GetOrAdd(this.GetType());
+            var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
 
             if (includeDescendants)
             {
@@ -232,13 +245,10 @@ namespace NerdyMishka.Models
         {
             this.BeginInit();
 
-            // TODO: cache reflection information and use expression trees
-            var properties = this.GetType().GetProperties(
-                BindingFlags.DeclaredOnly |
-                BindingFlags.Public |
-                BindingFlags.Instance)
-                .Where(o => o.CanRead && o.CanWrite);
-
+            // TODO: determine if type needs to be cached.
+            ReflectionCache cache = ModelReflectionCache.Default;
+            var typeInfo = cache.GetOrAdd(this.GetType());
+            var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
             this.originalValues.Clear();
 
             if (includeDescendants)

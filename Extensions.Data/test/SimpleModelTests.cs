@@ -20,14 +20,12 @@ namespace Tests
         [Fact]
         public void SetInitialValues()
         {
-            var author = new Author();
-            var model = author.AsModel();
-            model.SetInitialValues((m) =>
+            var author = new Author(m =>
             {
                 m.Id = 12;
                 m.Name = "Shakespear";
             });
-
+            var model = author.AsModel();
             Assert.Equal("Shakespear", author.Name);
             Assert.Equal(12, author.Id.Value);
             Assert.True(model.ChangedProperies.Count == 0);
@@ -39,9 +37,11 @@ namespace Tests
         [Fact]
         public void TrackPropertyChanges()
         {
-            var author = new Author();
-            author.Id = 0;
-            author.Name = "Alexander";
+            var author = new Author
+            {
+                Id = 0,
+                Name = "Alexander",
+            };
             var model = author.AsModel();
             Assert.True(model.ChangedProperies.Count == 2);
             Assert.True(model.IsChanged);
@@ -72,9 +72,11 @@ namespace Tests
         [Fact]
         public void RejectPropertyChanges()
         {
-            var author = new Author();
-            author.Id = 0;
-            author.Name = "Alexander";
+            var author = new Author
+            {
+                Id = 0,
+                Name = "Alexander",
+            };
             var model = author.AsModel();
             Assert.True(model.ChangedProperies.Count == 2);
             Assert.True(model.IsChanged);
@@ -87,6 +89,10 @@ namespace Tests
             Assert.True(model.IsNew);
         }
 
+        // nameof is used because it creates an interned
+        // string that is a constant value. which means
+        // there is only one reference of the string
+        // in the program.
         internal class Author : Model<Author>
         {
             private int? id;
@@ -101,16 +107,22 @@ namespace Tests
                 this.EndInit();
             }
 
+            public Author(Action<Author> setInitialValues)
+                : this()
+            {
+                this.SetInitialValues(setInitialValues);
+            }
+
             public int? Id
             {
                 get => this.id;
-                set => this.Set("Id", ref this.id, value);
+                set => this.Set(nameof(this.Id), ref this.id, value);
             }
 
             public string Name
             {
                 get => this.name;
-                set => this.Set("Name", ref this.name, value);
+                set => this.Set(nameof(this.Name), ref this.name, value);
             }
         }
     }
