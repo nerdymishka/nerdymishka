@@ -11,14 +11,14 @@ namespace NerdyMishka.Models
         IModel<T>, IDataErrorInfo
         where T : Model<T>, IModel<T>
     {
-        private readonly Dictionary<string, IChangeTracker> descendants = new Dictionary<string, IChangeTracker>();
-
         private readonly Dictionary<string, object> originalValues = new Dictionary<string, object>();
 
         private readonly HashSet<string> changedProperies =
             new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
         private Dictionary<string, string> errors;
+
+        private Dictionary<string, IChangeTracker> descendants;
 
         private bool ignoreChanges = false;
 
@@ -56,6 +56,9 @@ namespace NerdyMishka.Models
             {
                 if (this.changedProperies.Count > 0)
                     return true;
+
+                if (this.descendants == null)
+                    return false;
 
                 foreach (var tracker in this.descendants.Values)
                     if (tracker.IsChanged)
@@ -149,29 +152,31 @@ namespace NerdyMishka.Models
         {
             this.BeginInit();
 
-            ReflectionCache cache = ModelReflectionCache.Default;
-            var typeInfo = cache.GetOrAdd(this.GetType());
-            var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
-            this.originalValues.Clear();
-
-            if (includeDescendants)
+            if (includeDescendants && this.descendants != null)
             {
                 foreach (var descendant in this.descendants.Values)
                     descendant.UpdateOriginalValues(includeDescendants);
             }
 
-            foreach (var propInfo in properties)
+            if (this.changedProperies.Count > 0)
             {
-                if (this.changedProperies.Contains(propInfo.Name))
+                ReflectionCache cache = ModelReflectionCache.Default;
+                var typeInfo = cache.GetOrAdd(this.GetType());
+                var properties = typeInfo.Properties.Where(o => o.CanRead && o.CanWrite);
+
+                foreach (var propInfo in properties)
                 {
-                    this.originalValues.Remove(propInfo.Name);
-                    this.originalValues.Add(propInfo.Name, propInfo.GetValue(this));
+                    if (this.changedProperies.Contains(propInfo.Name))
+                    {
+                        this.originalValues.Remove(propInfo.Name);
+                        this.originalValues.Add(propInfo.Name, propInfo.GetValue(this));
+                    }
+
+                    continue;
                 }
 
-                continue;
+                this.changedProperies.Clear();
             }
-
-            this.changedProperies.Clear();
 
             this.EndInit();
         }
@@ -197,6 +202,7 @@ namespace NerdyMishka.Models
         {
             if (newValue is IChangeTracker tracker)
             {
+                this.descendants = this.descendants ?? new Dictionary<string, IChangeTracker>();
                 this.descendants.Remove(name);
 
                 if (!(tracker is null))
@@ -256,7 +262,7 @@ namespace NerdyMishka.Models
         {
             this.BeginInit();
 
-            if (includeDescendants)
+            if (includeDescendants && this.descendants != null)
             {
                 foreach (var descendant in this.descendants.Values)
                     descendant.RejectChanges();
@@ -274,6 +280,13 @@ namespace NerdyMishka.Models
                     {
                         if (this.originalValues.TryGetValue(propInfo.Name, out object value))
                         {
+                            if (value == null &&
+                                this.descendants != null &&
+                                this.descendants.ContainsKey(propInfo.Name))
+                            {
+                                this.descendants.Remove(propInfo.Name);
+                            }
+
                             propInfo.SetValue(this, value);
                         }
                     }
@@ -291,7 +304,7 @@ namespace NerdyMishka.Models
         {
             this.BeginInit();
 
-            if (includeDescendants)
+            if (includeDescendants && this.descendants != null)
             {
                 foreach (var descendant in this.descendants.Values)
                     descendant.AcceptChanges();

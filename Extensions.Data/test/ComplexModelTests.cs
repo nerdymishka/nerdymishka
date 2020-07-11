@@ -81,6 +81,68 @@ namespace Tests
             Assert.True(model2.Descendants.Count == 2);
         }
 
+        [Fact]
+        public void RejectChangesForChildCollection()
+        {
+            var author = new Author();
+            var model = author.AsModel();
+            var set = author.Books;
+            var model2 = set.AsModel();
+            Assert.False(model.IsChanged);
+            Assert.True(model.IsNew);
+            Assert.False(model.IsDeleted);
+            Assert.True(model.Descendants.Count == 1);
+            Assert.True(model.ChangedProperies.Count == 0);
+
+            author.Name = "Byron";
+            author.Books.Add(new Book(m => m.Name = "First"));
+            author.Books.Add(new Book(m => m.Name = "Second"));
+
+            Assert.True(model.IsChanged);
+            Assert.True(model.Descendants.Count == 1);
+            Assert.True(model.ChangedProperies.Count == 1);
+            Assert.True(model2.Additions.Count == 2);
+            Assert.True(model2.IsChanged);
+            Assert.True(set.Count == 2);
+
+            model.RejectChanges();
+
+            Assert.False(model.IsChanged);
+            Assert.True(model.Descendants.Count == 1);
+            Assert.True(model.ChangedProperies.Count == 0);
+            Assert.Null(author.Name);
+            Assert.False(model2.IsChanged);
+            Assert.True(model2.Additions.Count == 0);
+            Assert.True(set.Count == 0);
+            Assert.True(model2.Descendants.Count == 0);
+        }
+
+        [Fact]
+        public void RejectChangesForChildObject()
+        {
+            var author = new Author();
+            var model = author.AsModel();
+
+            Assert.False(model.IsChanged);
+            Assert.True(model.IsNew);
+            Assert.False(model.IsDeleted);
+            Assert.True(model.Descendants.Count == 1);
+            Assert.True(model.ChangedProperies.Count == 0);
+
+            author.ContactInfo = new ContactInfo();
+
+            Assert.True(model.IsChanged);
+            Assert.True(model.Descendants.Count == 2);
+            Assert.True(model.ChangedProperies.Count == 1);
+
+            model.RejectChanges();
+
+            Assert.False(model.IsChanged);
+            Assert.True(model.Descendants.Count == 1);
+            Assert.True(model.ChangedProperies.Count == 0);
+            Assert.Null(author.ContactInfo);
+        }
+
         internal class Book : Model<Book>
         {
             private string name;
