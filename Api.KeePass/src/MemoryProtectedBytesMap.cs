@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using NerdyMishka.Security.Cryptography;
 
 namespace NerdyMishka.Api.KeePass
 {
+    [SuppressMessage("", "CA1710:", Justification = "By Design")]
     public class MemoryProtectedBytesMap :
         IEnumerable<KeyValuePair<int, MemoryProtectedBytes>>
     {

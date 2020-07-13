@@ -1,10 +1,6 @@
-﻿/*
-
+﻿using System;
+using NerdyMishka.Api.KeePass.Package;
 using NerdyMishka.Security.Cryptography;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 namespace NerdyMishka.Api.KeePass
 {
@@ -12,19 +8,17 @@ namespace NerdyMishka.Api.KeePass
     {
         CompositeKey CompositeKey { get; }
 
-        KeePassFileHeaderInformation HeaderInfo { get; }
+        HeaderInfo HeaderInfo { get; }
 
-        KeePassPackageMetaInfo MetaInfo { get; }
+        IPackageMetaInfo MetaInfo { get; }
 
         IKeePassDocument Document { get; }
 
-        //IList<BinaryMapping> Binaries { get; }
+        CustomDataDictionary CustomData { get; }
 
-        /// <summary>
-        /// Custom Data
-        /// </summary>
-        IList<StringMapping> Strings { get; }
+        MemoryProtectedBytesMap BinaryMap { get; }
 
+        /*
         void AttachFile(IKeePassEntry entry, string path);
 
         void AttachBinary(IKeePassEntry entry, string key, byte[] data);
@@ -90,6 +84,6 @@ namespace NerdyMishka.Api.KeePass
         IKeePassPackage Save(MasterKey key, Stream stream, IKeePassPackageSerializer serializer);
 
         IKeePassPackage Save(Stream stream, IKeePassPackageSerializer serializer);
+        */
     }
 }
-*/

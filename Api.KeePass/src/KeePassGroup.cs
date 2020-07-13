@@ -13,6 +13,10 @@ namespace NerdyMishka.Api.KeePass
 
         private IKeePassAuditFields auditFields = new KeePassAuditFields();
 
+        private IKeePassPackage package;
+
+        private IKeePassGroup parent;
+
         public bool IsExpanded { get; set; }
 
         public string DefaultAutoTypeSequence { get; set; }
@@ -23,12 +27,44 @@ namespace NerdyMishka.Api.KeePass
 
         public KeePassIdentifier LastTopVisibleEntryId { get; set; }
 
+        public IKeePassGroup Parent
+        {
+            get => this.parent;
+            protected internal set
+            {
+                this.parent = value;
+            }
+        }
+
+        public IKeePassPackage Package
+        {
+            get => this.package;
+            protected internal set
+            {
+                this.package = value;
+                this.Groups.Package = value;
+                this.Entries.Package = value;
+            }
+        }
+
+        IKeePassPackage IKeePassChild.Package
+        {
+            get => this.Package;
+            set => this.Package = value;
+        }
+
+        IKeePassGroup IKeePassChild.Parent
+        {
+            get => this.Parent;
+            set => this.Parent = value;
+        }
+
         public MoveableList<IKeePassEntry> Entries
         {
             get
             {
                 if (this.entries == null)
-                    this.entries = new MoveableList<IKeePassEntry>();
+                    this.entries = new MoveableList<IKeePassEntry>(this.Package, this);
 
                 return this.entries;
             }
@@ -39,7 +75,7 @@ namespace NerdyMishka.Api.KeePass
             get
             {
                 if (this.groups == null)
-                    this.groups = new MoveableList<IKeePassGroup>();
+                    this.groups = new MoveableList<IKeePassGroup>(this.Package, this);
 
                 return this.groups;
             }

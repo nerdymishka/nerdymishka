@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NerdyMishka.Api.KeePass
 {
-    public interface IKeePassNode
+    public interface IKeePassNode : IKeePassChild
     {
         KeePassIdentifier Id { get; set; }
 

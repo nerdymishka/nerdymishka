@@ -6,26 +6,69 @@ using System.Diagnostics.CodeAnalysis;
 namespace NerdyMishka.Api.KeePass
 {
     [SuppressMessage("Microsoft.Naming", "CA1710:", Justification = "By Design")]
-    public class MoveableList<T> : IList<T>, ICloneable<MoveableList<T>>
+    public class MoveableList<T> : IList<T>,
+        ICloneable<MoveableList<T>>,
+        IChildCloneable<MoveableList<T>>
+        where T : IKeePassChild
     {
         private List<T> list = new List<T>();
 
         private bool isCloneable = false;
 
-        public MoveableList()
+        private IKeePassPackage package;
+
+        private IKeePassGroup parent;
+
+        public MoveableList(IKeePassPackage package, IKeePassGroup group = null)
         {
+            this.package = package;
+            this.parent = group;
             var type = typeof(T);
-            var cloneableInterface = type.GetInterface($"ICloneable{type.FullName}");
+            var cloneableInterface = type.GetInterface($"IChildCloneable{type.FullName}");
             this.isCloneable = cloneableInterface != null;
         }
 
-        public MoveableList(IEnumerable<T> values)
-            : this()
+        public MoveableList(IKeePassPackage package, IKeePassGroup group, IEnumerable<T> values)
+            : this(package, group)
         {
             this.list = new List<T>(values);
         }
 
         public int Count => this.list.Count;
+
+        public IKeePassPackage Package
+        {
+            get => this.package;
+            set
+            {
+                if (this.package != value)
+                {
+                    foreach (IKeePassNode node in this.list)
+                    {
+                        node.Package = value;
+                    }
+
+                    this.package = value;
+                }
+            }
+        }
+
+        public IKeePassGroup Parent
+        {
+            get => this.parent;
+            set
+            {
+                if (this.parent != value)
+                {
+                    foreach (IKeePassNode node in this.list)
+                    {
+                        node.Parent = value;
+                    }
+
+                    this.parent = value;
+                }
+            }
+        }
 
         public bool IsReadOnly => false;
 
@@ -49,20 +92,25 @@ namespace NerdyMishka.Api.KeePass
         }
 
         public void Add(T item)
-            => this.list.Add(item);
+        {
+            this.list.Add(item);
+
+            // only set parents if add doesn't throw
+            item.Package = this.package;
+            item.Parent = this.parent;
+        }
 
         public void Clear()
             => this.list.Clear();
 
-        public MoveableList<T> Clone()
+        public MoveableList<T> Clone(IKeePassPackage package, IKeePassGroup parent)
         {
-            var set = new MoveableList<T>();
-
+            var set = new MoveableList<T>(package, parent);
             if (this.isCloneable)
             {
-                foreach (ICloneable<T> item in this.list)
+                foreach (IChildCloneable<T> item in this.list)
                 {
-                    set.Add(item.Clone());
+                    set.Add(item.Clone(package, parent));
                 }
 
                 return set;
@@ -74,6 +122,11 @@ namespace NerdyMishka.Api.KeePass
             }
 
             return set;
+        }
+
+        public MoveableList<T> Clone()
+        {
+            return this.Clone(this.package, this.parent);
         }
 
         public void MoveTop(int index)
@@ -233,13 +286,29 @@ namespace NerdyMishka.Api.KeePass
             => this.IndexOf(item);
 
         public void Insert(int index, T item)
-            => this.Insert(index, item);
+        {
+            this.list.Insert(index, item);
+
+            // only set parents if insert doesn't throw
+            item.Package = this.Package;
+            item.Parent = this.Parent;
+        }
 
         public bool Remove(T item)
-            => this.list.Remove(item);
+        {
+            item.Parent = null;
+            return this.Remove(item);
+        }
 
         public void RemoveAt(int index)
-            => this.RemoveAt(index);
+        {
+            var item = this[index];
+            if (item != null)
+            {
+                item.Parent = null;
+                this.RemoveAt(index);
+            }
+        }
 
         IEnumerator IEnumerable.GetEnumerator()
             => this.GetEnumerator();

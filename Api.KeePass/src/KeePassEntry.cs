@@ -27,11 +27,47 @@ namespace NerdyMishka.Api.KeePass
 
         private CustomDataDictionary customData;
 
+        private IKeePassPackage package;
+
+        private IKeePassGroup parent;
+
         public string ForegroundColor { get; set; }
 
         public string BackgroundColor { get; set; }
 
         public string OverrideUrl { get; set; }
+
+        public IKeePassGroup Parent
+        {
+            get => this.parent;
+            protected internal set
+            {
+                this.History.Parent = value;
+                this.parent = value;
+            }
+        }
+
+        public IKeePassPackage Package
+        {
+            get => this.package;
+            protected internal set
+            {
+                this.History.Package = value;
+                this.package = value;
+            }
+        }
+
+        IKeePassPackage IKeePassChild.Package
+        {
+            get => this.Package;
+            set => this.Package = value;
+        }
+
+        IKeePassGroup IKeePassChild.Parent
+        {
+            get => this.Parent;
+            set => this.Parent = value;
+        }
 
         public IList<string> Tags
         {
@@ -81,7 +117,7 @@ namespace NerdyMishka.Api.KeePass
             get
             {
                 if (this.history == null)
-                    this.history = new MoveableList<IKeePassEntry>();
+                    this.history = new MoveableList<IKeePassEntry>(this.Package, this.Parent);
 
                 return this.history;
             }
@@ -91,7 +127,7 @@ namespace NerdyMishka.Api.KeePass
                 if (value is null)
                     this.history = null;
                 else
-                    this.history = new MoveableList<IKeePassEntry>(value);
+                    this.history = new MoveableList<IKeePassEntry>(this.Package, this.Parent);
             }
         }
 

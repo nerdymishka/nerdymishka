@@ -6,14 +6,12 @@ namespace NerdyMishka.Api.KeePass
 {
     public interface IKeePassDocument
     {
-        IList<DeletedObjectInfo> DeletedObjects { get; }
+        IKeePassPackage Package { get; }
 
-        IEnumerable<IKeePassGroup> Groups { get; }
+        MoveableList<DeletedObjectInfo> DeletedObjects { get; }
+
+        MoveableList<IKeePassGroup> Groups { get; }
 
         IKeePassGroup RootGroup { get; }
-
-        void Add(IKeePassGroup group);
-
-        void Remove(IKeePassGroup group);
     }
 }

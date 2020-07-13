@@ -5,11 +5,19 @@ using System.Threading.Tasks;
 
 namespace NerdyMishka.Api.KeePass
 {
-    public struct DeletedObjectInfo : IEquatable<DeletedObjectInfo>
+    public struct DeletedObjectInfo :
+        IKeePassChild,
+        IEquatable<DeletedObjectInfo>,
+        ICloneable<DeletedObjectInfo>,
+        IChildCloneable<DeletedObjectInfo>
     {
         public KeePassIdentifier Id { get; set; }
 
         public DateTime DeletionTime { get; set; }
+
+        public IKeePassPackage Package { get; set; }
+
+        public IKeePassGroup Parent { get; set; }
 
         public static bool operator ==(DeletedObjectInfo left, DeletedObjectInfo right)
         {
@@ -43,6 +51,22 @@ namespace NerdyMishka.Api.KeePass
         public override int GetHashCode()
         {
             return this.Id.GetHashCode() + this.DeletionTime.GetHashCode();
+        }
+
+        public DeletedObjectInfo Clone(IKeePassPackage package, IKeePassGroup group)
+        {
+            return new DeletedObjectInfo()
+            {
+                DeletionTime = this.DeletionTime,
+                Id = this.Id,
+                Package = package,
+                Parent = group,
+            };
+        }
+
+        public DeletedObjectInfo Clone()
+        {
+            return this.Clone(this.Package, this.Parent);
         }
     }
 }
