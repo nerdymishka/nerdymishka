@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace NerdyMishka.Api.KeePass
@@ -19,32 +20,6 @@ namespace NerdyMishka.Api.KeePass
         MoveableList<IKeePassGroup> Groups { get; }
 
         /// <summary>
-        /// Adds the entry to the group. Sets the entry owner to
-        /// the instance of this group.
-        /// </summary>
-        /// <param name="entry">The entry to add.</param>
-        void Add(IKeePassEntry entry);
-
-        /// <summary>
-        /// Adds the sub group to the group. Sets the sub group owner to
-        /// the instance of this group.
-        /// </summary>
-        /// <param name="group">The sub group to add.</param>
-        void Add(IKeePassGroup group);
-
-        /// <summary>
-        /// Removes entry from the group. Sets the owner to null.
-        /// </summary>
-        /// <param name="entry">The entry to remove.</param>
-        void Remove(IKeePassEntry entry);
-
-        /// <summary>
-        /// Removes the group from the group. Sets the owner to null.
-        /// </summary>
-        /// <param name="group">The group to remove.</param>
-        void Remove(IKeePassGroup group);
-
-        /// <summary>
         /// Gets a group by index. If the index is higher than
         /// the number of groups or lower than zero, null is returned.
         /// </summary>
@@ -57,8 +32,11 @@ namespace NerdyMishka.Api.KeePass
         /// insensitive. Returns null if the entry is not found.
         /// </summary>
         /// <param name="name">The name (title) of the group.</param>
+        /// <param name="comparison">The type of compare to perform.</param>
         /// <returns>The group; otherwise, null.</returns>
-        IKeePassGroup Group(string name);
+        IKeePassGroup Group(
+            string name,
+            StringComparison comparison = StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Gets an entry by index. If the index is higher than the
@@ -73,8 +51,11 @@ namespace NerdyMishka.Api.KeePass
         /// insensitive. Returns null if the entry is not found.
         /// </summary>
         /// <param name="name">The name (title) of the entry.</param>
+        /// <param name="comparison">The type of compare to perform.</param>
         /// <returns>The entry; otherwise, null.</returns>
-        IKeePassEntry Entry(string name);
+        IKeePassEntry Entry(
+            string name,
+            StringComparison comparison = StringComparison.OrdinalIgnoreCase);
 
         /// <summary>
         /// Copies all the values of this instance to the destination group.
