@@ -2,7 +2,7 @@ using System.IO;
 
 namespace NerdyMishka.Api.KeePass.Package
 {
-    public interface IKeePassStreamCipher
+    public interface IKeePassCryptoStreamProvider
     {
         KeePassIdentifier Id { get; }
 

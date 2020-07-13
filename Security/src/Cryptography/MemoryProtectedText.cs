@@ -1,5 +1,6 @@
 using System;
 using System.Security;
+using System.Security.Cryptography;
 using System.Text;
 using NerdyMishka.Text;
 using NerdyMishka.Util.Collections;
@@ -8,6 +9,8 @@ namespace NerdyMishka.Security.Cryptography
 {
     public class MemoryProtectedText : MemoryProtectedBytes,
         IEquatable<MemoryProtectedText>,
+        IEquatable<string>,
+        IEquatable<byte[]>,
         IComparable<MemoryProtectedText>
     {
         private string text;
@@ -53,16 +56,19 @@ namespace NerdyMishka.Security.Cryptography
         public MemoryProtectedText(ReadOnlySpan<byte> bytes, Encoding encoding = null, bool encrypt = true)
             : base(bytes, encrypt)
         {
+            var byteArray = bytes.ToArray();
             this.encoding = encoding ?? Utf8Options.NoBom;
+            this.Length = this.encoding.GetCharCount(byteArray);
+            Array.Clear(byteArray, 0, byteArray.Length);
         }
 
         public Encoding Encoding => this.encoding;
 
         public static bool operator ==(MemoryProtectedText left, MemoryProtectedText right)
         {
-            if (left == null)
+            if (left is null)
             {
-                if (right == null)
+                if (right is null)
                     return true;
 
                 return false;
@@ -73,9 +79,9 @@ namespace NerdyMishka.Security.Cryptography
 
         public static bool operator !=(MemoryProtectedText left, MemoryProtectedText right)
         {
-            if (left == null)
+            if (left is null)
             {
-                if (right != null)
+                if (right is object)
                     return true;
 
                 return false;
@@ -86,7 +92,7 @@ namespace NerdyMishka.Security.Cryptography
 
         public static bool operator >(MemoryProtectedText left, MemoryProtectedText right)
         {
-            if (left == null)
+            if (left is null)
             {
                 return false;
             }
@@ -96,7 +102,7 @@ namespace NerdyMishka.Security.Cryptography
 
         public static bool operator <(MemoryProtectedText left, MemoryProtectedText right)
         {
-            if (left == null)
+            if (left is null)
             {
                 return false;
             }
@@ -106,9 +112,9 @@ namespace NerdyMishka.Security.Cryptography
 
         public static bool operator >=(MemoryProtectedText left, MemoryProtectedText right)
         {
-            if (left == null)
+            if (left is null)
             {
-                if (left == null)
+                if (right is null)
                     return true;
 
                 return false;
@@ -119,9 +125,9 @@ namespace NerdyMishka.Security.Cryptography
 
         public static bool operator <=(MemoryProtectedText left, MemoryProtectedText right)
         {
-            if (left == null)
+            if (left is null)
             {
-                if (right == null)
+                if (right is null)
                     return true;
 
                 return false;
@@ -137,6 +143,33 @@ namespace NerdyMishka.Security.Cryptography
 
             this.hashCode = this.Hash.GetHashCode() * 13;
             return this.hashCode;
+        }
+
+        public ReadOnlySpan<char> ToCharSpan(Encoding encoding = null)
+        {
+            this.CheckDisposed();
+
+            if (this.text != null)
+                return this.text.AsSpan();
+
+            var decrypted = this.Decrypt().ToArray();
+            try
+            {
+                encoding = encoding ?? this.GetEncoding();
+                char[] chars = encoding.GetChars(decrypted);
+                return chars;
+            }
+            finally
+            {
+                Array.Clear(decrypted, 0, decrypted.Length);
+            }
+        }
+
+        public ReadOnlySpan<byte> ToByteSpan()
+        {
+            this.CheckDisposed();
+
+            return this.Decrypt().ToArray();
         }
 
         public string ToString(bool unprotect = false, Encoding encoding = null)
@@ -218,7 +251,7 @@ namespace NerdyMishka.Security.Cryptography
                 return string.CompareOrdinal(this.text, other.text);
 
             // use hashes to avoid decrypting when possible.
-            if (this.Hash.EqualTo(this.Hash))
+            if (this.Hash.EqualTo(other.Hash))
                 return 0;
 
             var a = new char[this.Length];
@@ -254,7 +287,7 @@ namespace NerdyMishka.Security.Cryptography
         {
             this.CheckDisposed();
 
-            if (other == null)
+            if (other is null)
                 return false;
 
             if (other is MemoryProtectedText text1)
@@ -263,17 +296,59 @@ namespace NerdyMishka.Security.Cryptography
             return false;
         }
 
+        public bool Equals(byte[] other)
+        {
+            this.CheckDisposed();
+
+            if (other is null)
+                return false;
+
+            var length = this.GetEncoding().GetCharCount(other);
+            if (this.Length != length)
+                return false;
+
+            using (var sha = SHA256.Create())
+            {
+                var hash = sha.ComputeHash(other);
+                return hash.EqualTo(this.Hash);
+            }
+        }
+
         public bool Equals(MemoryProtectedText other)
         {
             this.CheckDisposed();
 
-            if (other == null)
+            if (other is null)
                 return false;
+
+            if (this.Hash.EqualTo(other.Hash))
+                return true;
 
             if (this.text != null && other.text != null)
                 return this.text == other.text;
 
             return this.Equals((MemoryProtectedBytes)other);
+        }
+
+        public bool Equals(string other)
+        {
+            this.CheckDisposed();
+
+            if (other is null)
+                return false;
+
+            if (this.Length != other.Length)
+                return false;
+
+            if (this.text is object)
+                return this.text == other;
+
+            var bytes = this.GetEncoding().GetBytes(other);
+            using (var sha = SHA256.Create())
+            {
+                var hash = sha.ComputeHash(bytes);
+                return this.Hash.EqualTo(hash);
+            }
         }
 
         protected override void CheckDisposed()

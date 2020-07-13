@@ -14,11 +14,9 @@ namespace NerdyMishka.Api.KeePass
 
         KeePassIdentifier LastTopVisibleEntryId { get; set; }
 
-        IEnumerable<IKeePassEntry> Entries { get; }
+        MoveableList<IKeePassEntry> Entries { get; }
 
-        IEnumerable<IKeePassGroup> Groups { get; }
-
-        KeePassIdentifier CustomIconUuid { get; set; }
+        MoveableList<IKeePassGroup> Groups { get; }
 
         /// <summary>
         /// Adds the entry to the group. Sets the entry owner to

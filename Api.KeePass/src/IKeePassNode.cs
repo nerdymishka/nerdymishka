@@ -8,12 +8,12 @@ namespace NerdyMishka.Api.KeePass
     {
         KeePassIdentifier Id { get; set; }
 
+        KeePassIdentifier CustomIconUuid { get; set; }
+
         int IconId { get; set; }
 
         IKeePassAuditFields AuditFields { get; }
 
         string Name { get; set; }
-
-        string Notes { get; set; }
     }
 }

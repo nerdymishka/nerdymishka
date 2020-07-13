@@ -5,11 +5,7 @@ namespace NerdyMishka.Api.KeePass
 {
     public interface IKeePassPassword
     {
-        void SetValue(byte[] decryptedBytes);
-
-        void SetValue(string value);
-
-        void SetValue(char[] value);
+        void SetValue(SecureString value);
 
         void SetValue(ReadOnlySpan<char> value);
 
@@ -19,9 +15,9 @@ namespace NerdyMishka.Api.KeePass
 
         char[] ToCharArray();
 
-        ReadOnlySpan<char> ToChars();
+        ReadOnlySpan<char> ToReadOnlyCharSpan();
 
-        ReadOnlySpan<byte> ToReadOnlySpan();
+        ReadOnlySpan<byte> ToReadOnlyByteSpan();
 
         SecureString ToSecureString();
 

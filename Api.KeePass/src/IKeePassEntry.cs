@@ -12,35 +12,23 @@ namespace NerdyMishka.Api.KeePass
         Justification = "By Design. Urls could be malformed by the user.")]
     public interface IKeePassEntry : IKeePassNode
     {
-        IKeePassEntryFields Fields { get; }
-
-        IKeePassPassword Password { get; set; }
-
         string ForegroundColor { get; set; }
 
         string BackgroundColor { get; set; }
 
         string OverrideUrl { get; set; }
 
-        string UserName { get; set; }
-
-        string Url { get; set; }
-
         IList<string> Tags { get; }
 
-        IList<MemoryProtectedText> Strings { get; }
+        MemoryProtectedTextDictionary Strings { get; }
 
         IKeePassAutoType AutoType { get; set; }
 
-        IList<IKeePassEntry> History { get; }
+        MoveableList<IKeePassEntry> History { get; }
 
         bool IsHistorical { get; set; }
 
-        IList<MemoryProtectedBytes> Binaries { get; }
-
-        bool PreventAutoCreate { get; set; }
-
-        KeePassIdentifier CustomIconUuid { get; set; }
+        MemoryProtectedBytesDictionary Binaries { get; }
 
         IKeePassEntry CopyTo(IKeePassEntry destination, bool cleanHistory = false);
     }
