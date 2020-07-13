@@ -20,7 +20,7 @@ namespace NerdyMishka.Api.KeePass.Serialization
 
         public byte DatabaseCompression { get; set; }
 
-        public MemoryProtectedBytesMap BinaryMap { get; }
+        public MemoryProtectedBytesMap BinaryMap { get; protected internal set; }
 
         public IDictionary<Type, Type> Mappings { get; internal set; }
     }

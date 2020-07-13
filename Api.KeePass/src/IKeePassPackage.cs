@@ -10,13 +10,13 @@ namespace NerdyMishka.Api.KeePass
 
         HeaderInfo HeaderInfo { get; }
 
-        IPackageMetaInfo MetaInfo { get; }
+        PackageInfo MetaInfo { get; }
 
         IKeePassDocument Document { get; }
 
         CustomDataDictionary CustomData { get; }
 
-        MemoryProtectedBytesMap BinaryMap { get; }
+        MemoryProtectedBytesMap BinaryMap { get; set; }
 
         /*
         void AttachFile(IKeePassEntry entry, string path);
