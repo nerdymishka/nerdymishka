@@ -25,6 +25,8 @@ namespace NerdyMishka.Api.KeePass
 
         private MemoryProtectedBytesDictionary binaries;
 
+        private CustomDataDictionary customData;
+
         public string ForegroundColor { get; set; }
 
         public string BackgroundColor { get; set; }
@@ -58,6 +60,17 @@ namespace NerdyMishka.Api.KeePass
                     this.strings = new MemoryProtectedTextDictionary();
 
                 return this.strings;
+            }
+        }
+
+        public CustomDataDictionary CustomData
+        {
+            get
+            {
+                if (this.customData == null)
+                    this.customData = new CustomDataDictionary();
+
+                return this.customData;
             }
         }
 

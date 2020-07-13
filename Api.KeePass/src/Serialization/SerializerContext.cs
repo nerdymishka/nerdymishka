@@ -11,7 +11,7 @@ namespace NerdyMishka.Api.KeePass.Serialization
     {
         public SerializerContext()
         {
-            this.Binaries = new List<BinaryMapping>();
+            this.BinaryMap = new MemoryProtectedBytesMap();
         }
 
         public IRandomByteGenerator RandomByteGenerator { get; set; }
@@ -20,7 +20,7 @@ namespace NerdyMishka.Api.KeePass.Serialization
 
         public byte DatabaseCompression { get; set; }
 
-        public List<BinaryMapping> Binaries { get; }
+        public MemoryProtectedBytesMap BinaryMap { get; }
 
         public IDictionary<Type, Type> Mappings { get; internal set; }
     }

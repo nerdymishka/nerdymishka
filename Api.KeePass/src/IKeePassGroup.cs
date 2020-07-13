@@ -13,11 +13,15 @@ namespace NerdyMishka.Api.KeePass
 
         bool? EnableSearching { get; set; }
 
+        string Notes { get; set; }
+
         KeePassIdentifier LastTopVisibleEntryId { get; set; }
 
         MoveableList<IKeePassEntry> Entries { get; }
 
         MoveableList<IKeePassGroup> Groups { get; }
+
+        CustomDataDictionary CustomData { get; }
 
         /// <summary>
         /// Gets a group by index. If the index is higher than

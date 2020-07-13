@@ -18,17 +18,19 @@ namespace NerdyMishka.Api.KeePass
 
         string OverrideUrl { get; set; }
 
+        bool IsHistorical { get; set; }
+
+        IKeePassAutoType AutoType { get; set; }
+
         IList<string> Tags { get; }
 
         MemoryProtectedTextDictionary Strings { get; }
 
-        IKeePassAutoType AutoType { get; set; }
+        MemoryProtectedBytesDictionary Binaries { get; }
 
         MoveableList<IKeePassEntry> History { get; }
 
-        bool IsHistorical { get; set; }
-
-        MemoryProtectedBytesDictionary Binaries { get; }
+        CustomDataDictionary CustomData { get; }
 
         IKeePassEntry CopyTo(IKeePassEntry destination, bool cleanHistory = false);
     }

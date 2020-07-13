@@ -9,6 +9,8 @@ namespace NerdyMishka.Api.KeePass
 
         private MoveableList<IKeePassGroup> groups;
 
+        private CustomDataDictionary customData;
+
         private IKeePassAuditFields auditFields = new KeePassAuditFields();
 
         public bool IsExpanded { get; set; }
@@ -43,6 +45,17 @@ namespace NerdyMishka.Api.KeePass
             }
         }
 
+        public CustomDataDictionary CustomData
+        {
+            get
+            {
+                if (this.customData == null)
+                    this.customData = new CustomDataDictionary();
+
+                return this.customData;
+            }
+        }
+
         public KeePassIdentifier Id { get; set; }
 
         public KeePassIdentifier CustomIconUuid { get; set; }
@@ -52,6 +65,8 @@ namespace NerdyMishka.Api.KeePass
         public IKeePassAuditFields AuditFields => this.auditFields;
 
         public string Name { get; set; }
+
+        public string Notes { get; set; }
 
         public IKeePassGroup CopyTo(IKeePassGroup destinationGroup)
         {
