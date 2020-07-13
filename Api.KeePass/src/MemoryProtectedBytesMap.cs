@@ -1,12 +1,18 @@
+using System.Collections;
 using System.Collections.Generic;
 using NerdyMishka.Security.Cryptography;
 
 namespace NerdyMishka.Api.KeePass
 {
-    public class MemoryProtectedBytesMap
+    public class MemoryProtectedBytesMap :
+        IEnumerable<KeyValuePair<int, MemoryProtectedBytes>>
     {
         private Dictionary<int, MemoryProtectedBytes> dictionary =
             new Dictionary<int, MemoryProtectedBytes>();
+
+        private int nextIndentity = 0;
+
+        public int Count => this.dictionary.Count;
 
         public MemoryProtectedBytes this[int key]
         {
@@ -27,6 +33,11 @@ namespace NerdyMishka.Api.KeePass
             }
         }
 
+        public void Add(int key, MemoryProtectedBytes bytes)
+        {
+            this.dictionary.Add(key, bytes);
+        }
+
         public void Add(MemoryProtectedBytes bytes)
         {
             if (bytes is null)
@@ -37,7 +48,14 @@ namespace NerdyMishka.Api.KeePass
             if (index != -1)
                 return;
 
-            this.dictionary.Add(this.dictionary.Count, bytes);
+            while (this.dictionary.ContainsKey(index))
+            {
+                this.nextIndentity++;
+                index = this.nextIndentity;
+            }
+
+            this.dictionary.Add(index, bytes);
+            this.nextIndentity++;
         }
 
         public void Add(IKeePassGroup group)
@@ -89,6 +107,9 @@ namespace NerdyMishka.Api.KeePass
                 this.Add(pair.Value);
         }
 
+        public void Clear()
+            => this.dictionary.Clear();
+
         public int IndexOf(MemoryProtectedBytes bytes)
         {
             if (bytes is null)
@@ -105,5 +126,11 @@ namespace NerdyMishka.Api.KeePass
 
             return -1;
         }
+
+        public IEnumerator<KeyValuePair<int, MemoryProtectedBytes>> GetEnumerator()
+            => this.dictionary.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator()
+            => this.GetEnumerator();
     }
 }
