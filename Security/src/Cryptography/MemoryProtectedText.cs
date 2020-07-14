@@ -251,7 +251,7 @@ namespace NerdyMishka.Security.Cryptography
                 return string.CompareOrdinal(this.text, other.text);
 
             // use hashes to avoid decrypting when possible.
-            if (this.Hash.EqualTo(other.Hash))
+            if (this.Hash.Equals(other.Hash))
                 return 0;
 
             var a = new char[this.Length];
@@ -307,11 +307,17 @@ namespace NerdyMishka.Security.Cryptography
             if (this.Length != length)
                 return false;
 
-            using (var sha = SHA256.Create())
+            if (this.text != null)
             {
-                var hash = sha.ComputeHash(other);
-                return hash.EqualTo(this.Hash);
+                var bytes = this.GetEncoding().GetBytes(this.text);
+                return bytes.EqualTo(other);
             }
+
+            var hash = EncryptionUtil.ComputeChecksum(
+                other,
+                HashAlgorithmName.SHA256);
+
+            return hash.SequenceEqual(this.Hash.Span);
         }
 
         public bool Equals(MemoryProtectedText other)
@@ -321,7 +327,7 @@ namespace NerdyMishka.Security.Cryptography
             if (other is null)
                 return false;
 
-            if (this.Hash.EqualTo(other.Hash))
+            if (this.Hash.Equals(other.Hash))
                 return true;
 
             if (this.text != null && other.text != null)
@@ -344,17 +350,17 @@ namespace NerdyMishka.Security.Cryptography
                 return this.text == other;
 
             var bytes = this.GetEncoding().GetBytes(other);
-            using (var sha = SHA256.Create())
-            {
-                var hash = sha.ComputeHash(bytes);
-                return this.Hash.EqualTo(hash);
-            }
+            var hash = EncryptionUtil.ComputeChecksum(
+                bytes,
+                HashAlgorithmName.SHA256);
+
+            return hash.SequenceEqual(this.Hash.Span);
         }
 
         protected override void CheckDisposed()
         {
             if (this.isDisposed)
-                throw new ObjectDisposedException($"{nameof(MemoryProtectedText)} - {this.IV}");
+                throw new ObjectDisposedException($"{nameof(MemoryProtectedText)} - {this.Id}");
         }
 
         protected override void Dispose(bool disposing)

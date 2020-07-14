@@ -16,39 +16,26 @@ namespace NerdyMishka.Security.Cryptography
 
         private static int s_blockGrowth = -1;
 
+        private static long s_counter;
+
         private byte[] data;
-
-        private byte[] hash;
-
-        private byte[] iv;
-
-        private byte[] key;
 
         private int hashCode = 0;
 
         private bool isDisposed = false;
 
+        private long id;
+
         public MemoryProtectedBytes()
         {
+            System.Threading.Interlocked.Increment(ref s_counter);
+            this.id = s_counter;
             this.data = Array.Empty<byte>();
-            this.hash = Array.Empty<byte>();
-            this.IV = NonceFactory.Generate();
-        }
-
-        public MemoryProtectedBytes(
-            ReadOnlySpan<byte> bytes,
-            ReadOnlySpan<byte> key,
-            ReadOnlySpan<byte> iv,
-            bool encrypt = true)
-        {
-            this.key = new byte[key.Length];
-            this.iv = new byte[iv.Length];
-            key.CopyTo(this.key);
-            iv.CopyTo(this.iv);
-            this.Init(bytes, encrypt);
+            this.Hash = Array.Empty<byte>();
         }
 
         public MemoryProtectedBytes(ReadOnlySpan<byte> bytes, bool encrypt = true)
+            : this()
         {
             this.Init(bytes, encrypt);
         }
@@ -58,31 +45,15 @@ namespace NerdyMishka.Security.Cryptography
             this.Dispose(false);
         }
 
+        public long Id => this.id;
+
         public bool IsReadOnly { get; protected set; }
 
         public bool IsProtected { get; protected set; }
 
         public int Length { get; protected set; }
 
-        public byte[] Hash => this.hash;
-
-        public byte[] IV
-        {
-            get => this.iv?.ToArray();
-            set
-            {
-                this.iv = value;
-            }
-        }
-
-        public byte[] Key
-        {
-            get => this.key?.ToArray();
-            set
-            {
-                this.key = value;
-            }
-        }
+        public ReadOnlyMemory<byte> Hash { get; protected set; }
 
         public static bool operator ==(MemoryProtectedBytes left, MemoryProtectedBytes right)
         {
@@ -121,9 +92,11 @@ namespace NerdyMishka.Security.Cryptography
         {
             this.CheckDisposed();
             Check.NotNull(nameof(array), array);
+            var l = Math.Min(this.Length, array.Length);
 
             var decrypted = this.Decrypt(this.data);
-            var l = Math.Min(this.Length, array.Length);
+            if (l < decrypted.Length)
+                throw new ArgumentOutOfRangeException(nameof(array));
 
             decrypted.CopyTo(array);
         }
@@ -138,13 +111,19 @@ namespace NerdyMishka.Security.Cryptography
         {
             this.CheckDisposed();
 
-            if (other == null)
-                return false;
-
             if (other is MemoryProtectedBytes bytes)
                 return this.Equals(bytes);
 
             return false;
+        }
+
+        public bool Equals(ReadOnlySpan<byte> bytes)
+        {
+            if (bytes.IsEmpty && (this.data == null || this.data.Length == 0))
+                return true;
+
+            var hash = EncryptionUtil.ComputeChecksum(bytes, HashAlgorithmName.SHA256);
+            return hash.SequenceEqual(this.Hash.Span);
         }
 
         public bool Equals(MemoryProtectedBytes other)
@@ -160,13 +139,10 @@ namespace NerdyMishka.Security.Cryptography
             if (this.Length != other.Length)
                 return false;
 
-            if (!this.IV.EqualTo(other.IV))
-                return false;
-
-            if (this.hash == null && other.hash == null)
+            if (this.Hash.IsEmpty && other.Hash.IsEmpty)
                 return true;
 
-            return this.hash.EqualTo(other.hash);
+            return this.Hash.Equals(other.Hash);
         }
 
         public override int GetHashCode()
@@ -177,7 +153,7 @@ namespace NerdyMishka.Security.Cryptography
             if (this.hashCode > 0)
                 return this.hashCode;
 
-            this.hashCode = this.hash.GetHashCode() * 7;
+            this.hashCode = this.Hash.GetHashCode() * 7;
             return this.hashCode;
         }
 
@@ -213,22 +189,7 @@ namespace NerdyMishka.Security.Cryptography
 
         protected virtual void UpdateHash(ReadOnlySpan<byte> bytes)
         {
-            using (var sha = SHA256.Create())
-            {
-#if NETSTANDARD2_0
-                this.hash = sha.ComputeHash(bytes.ToArray());
-#else
-                var size = sha.HashSize >> 3;
-                Span<byte> uiSpan = stackalloc byte[64];
-                uiSpan = uiSpan.Slice(0, size);
-                if (!sha.TryComputeHash(bytes, uiSpan, out int bytesWritten) || bytesWritten != size)
-                {
-                    throw new CryptographicException();
-                }
-
-                this.hash = uiSpan.ToArray();
-#endif
-            }
+            EncryptionUtil.ComputeChecksum(bytes, HashAlgorithmName.SHA256);
         }
 
         protected virtual void Update(ReadOnlySpan<byte> decryptedBytes)
@@ -249,9 +210,6 @@ namespace NerdyMishka.Security.Cryptography
 
         protected void Init(ReadOnlySpan<byte> bytes, bool encrypt = true)
         {
-            if (this.iv == null)
-                this.iv = NonceFactory.Generate();
-
             this.IsProtected = encrypt;
             this.Update(bytes);
         }
@@ -259,7 +217,7 @@ namespace NerdyMishka.Security.Cryptography
         protected virtual void CheckDisposed()
         {
             if (this.isDisposed)
-                throw new ObjectDisposedException($"{nameof(MemoryProtectedBytes)} - {this.IV}");
+                throw new ObjectDisposedException($"{nameof(MemoryProtectedBytes)}");
         }
 
         protected virtual void Dispose(bool disposing)
@@ -272,19 +230,8 @@ namespace NerdyMishka.Security.Cryptography
                 if (this.data != null)
                     Array.Clear(this.data, 0, this.data.Length);
 
-                if (this.hash != null)
-                    Array.Clear(this.hash, 0, this.hash.Length);
-
-                if (this.Key != null)
-                {
-                    Array.Clear(this.Key, 0, this.Key.Length);
-                    Array.Clear(this.IV, 0, this.IV.Length);
-                }
-
                 this.data = null;
-                this.hash = null;
-                this.Key = null;
-                this.IV = null; // reference in NonceFactory
+                this.Hash = null;
             }
 
             this.isDisposed = true;

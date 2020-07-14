@@ -6,7 +6,14 @@ namespace NerdyMishka.Util.Streams
 {
     public static class StreamExtensions
     {
+        public static void Write(this Stream stream, ReadOnlyMemory<byte> memory)
+        {
+            Check.NotNull(nameof(stream), stream);
+            stream.Write(memory.Span);
+        }
+
 #if NETSTANDARD2_0
+
         public static void Write(this Stream stream, ReadOnlySpan<byte> buffer)
         {
             Check.NotNull(nameof(stream), stream);

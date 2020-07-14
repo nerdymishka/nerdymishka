@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using NerdyMishka.Security.Cryptography;
+using NerdyMishka.Util.Binary;
+using static NerdyMishka.Util.Binary.LittleEndianBitConverter;
 
 namespace NerdyMishka.Api.KeePass.Package
 {
@@ -10,31 +13,42 @@ namespace NerdyMishka.Api.KeePass.Package
 
         public const uint Signature2 = 0xB54BFB67;
 
-        public const uint Version = 0x00030001;
+        public const uint Version3 = 0x00030001;
 
         public const uint Version4 = 0x0004000;
+
+        public const uint Latest = Version4;
 
         internal const uint Mask = 0xFFFF0000;
 
         private byte[] randomByteGeneratorCryptoKey;
 
-        private byte randomByteGeneratorCryptoType;
+        private int randomByteGeneratorCryptoType;
 
         private IRandomByteGenerator randomByteGenerator;
 
-        public KeePassIdentifier DatabaseCipherId { get; set; }
+        public HeaderInfo(int version)
+        {
+            this.GenerateValues(version);
+        }
 
-        public byte DatabaseCompression { get; set; }
+        public string Comment { get; set; }
 
-        public IReadOnlyList<byte> DatabaseCipherKeySeed { get; set; }
+        public KeePassIdentifier PackageCipherId { get; set; }
 
-        public IReadOnlyList<byte> MasterKeyHashKey { get; set; }
+        public int PackageCompression { get; set; }
 
-        public long MasterKeyHashRounds { get; set; }
+        public int FileVersion { get; set; } = (int)Version4;
 
-        public IReadOnlyList<byte> DatabaseCipherIV { get; set; }
+        public ReadOnlyMemory<byte> PackageCipherKey { get; set; }
 
-        public IReadOnlyList<byte> RandomByteGeneratorCryptoKey
+        public ReadOnlyMemory<byte> AesKdfPassword { get; set; }
+
+        public long AesKdfIterations { get; set; }
+
+        public ReadOnlyMemory<byte> PackageCipherIV { get; set; }
+
+        public ReadOnlyMemory<byte> RandomByteGeneratorCryptoKey
         {
             get
             {
@@ -44,25 +58,25 @@ namespace NerdyMishka.Api.KeePass.Package
             set
             {
                 this.randomByteGenerator = null;
-                if (value == null)
+                if (value.IsEmpty)
                 {
                     this.randomByteGeneratorCryptoKey = null;
                     return;
                 }
 
-                var set = new byte[value.Count];
+                var set = new byte[value.Length];
                 for (var i = 0; i < set.Length; i++)
                 {
-                    set[i] = value[i];
+                    set[i] = value.Span[i];
                 }
 
                 this.randomByteGeneratorCryptoKey = set;
             }
         }
 
-        public IReadOnlyList<byte> HeaderByteMarks { get; set; }
+        public ReadOnlyMemory<byte> StreamStartByteMarker { get; set; }
 
-        public byte RandomByteGeneratorCryptoType
+        public int RandomByteGeneratorCryptoType
         {
             get
             {
@@ -91,7 +105,40 @@ namespace NerdyMishka.Api.KeePass.Package
             }
         }
 
-        public IReadOnlyList<byte> Hash { get; set; }
+        public ReadOnlyMemory<byte> Hash { get; set; }
+
+        public VariantDictionary CustomData { get; set; }
+
+        public KdfParameters KdfParameters { get; set; }
+
+        public void ClearGeneratorEngine()
+        {
+            this.randomByteGenerator = null;
+        }
+
+        public void GenerateValues(int version)
+        {
+            this.FileVersion = version;
+            this.PackageCompression = (byte)1;
+
+            using (var rng = new NerdyRandomNumberGenerator())
+            {
+                if (this.FileVersion < Version4)
+                {
+                    if (this.AesKdfIterations == 0)
+                        this.AesKdfIterations = 60000;
+
+                    this.PackageCipherId = AesCryptoStreamProvider.KdfId;
+                    this.AesKdfPassword = rng.NextBytes(32);
+                    this.StreamStartByteMarker = rng.NextBytes(32);
+                    this.RandomByteGeneratorCryptoKey = rng.NextBytes(32);
+                    this.RandomByteGeneratorCryptoType = (byte)2;
+                }
+
+                this.PackageCipherKey = rng.NextBytes(32);
+                this.PackageCipherIV = rng.NextBytes(16);
+            }
+        }
 
         public void ReadFromStream(Stream stream)
         {
@@ -113,8 +160,8 @@ namespace NerdyMishka.Api.KeePass.Package
                 byte[] versionBytes = stream.ReadBytes(4);
                 uint version = versionBytes.ToUInt();
 
-                if ((version & Mask) > (Version & Mask))
-                    throw new FormatException("The file version is unsupported");
+                if ((version & Mask) > (Latest & Mask))
+                    throw new FormatException($"The file version {version} is unsupported");
 
                 ms.Write(signature1Bytes);
                 ms.Write(signature2Bytes);
@@ -125,9 +172,9 @@ namespace NerdyMishka.Api.KeePass.Package
                     // Add Logging Statement
                 }
 
-                ReadOnlySpan<byte> data = ms.ToArray();
-                this.Hash = data.ToSHA256Hash()
-                    .ToArray();
+                this.Hash = EncryptionUtil.ComputeChecksumAsMemory(
+                    ms.ToArray(),
+                    HashAlgorithmName.SHA256);
             }
         }
 
@@ -138,21 +185,41 @@ namespace NerdyMishka.Api.KeePass.Package
 
             stream.Write(Signature1);
             stream.Write(Signature2);
-            stream.Write(Version);
+            stream.Write((uint)this.FileVersion);
 
             var r = (byte)'\r';
             var n = (byte)'\n';
             var marker = new byte[] { r, n, r, n };
 
-            stream.WriteHeader(HeaderField.DatabaseCipherId, this.DatabaseCipherId);
-            stream.WriteHeader(HeaderField.DatabaseCipherKeySeed, this.DatabaseCipherKeySeed);
-            stream.WriteHeader(HeaderField.MasterKeyHashSeed, this.MasterKeyHashKey);
-            stream.WriteHeader(HeaderField.MasterKeyHashRounds, BitConverter.GetBytes((ulong)this.MasterKeyHashRounds));
-            stream.WriteHeader(HeaderField.DatabaseCipherIV, this.DatabaseCipherIV);
-            stream.WriteHeader(HeaderField.RandomBytesCryptoKey, this.RandomByteGeneratorCryptoKey);
-            stream.WriteHeader(HeaderField.HeaderByteMark, this.HeaderByteMarks);
-            stream.WriteHeader(HeaderField.RandomBytesCryptoType, BitConverter.GetBytes(this.RandomByteGeneratorCryptoType));
-            stream.WriteHeader(HeaderField.DatabaseCompression, BitConverter.GetBytes(this.DatabaseCompression));
+            stream.WriteHeader(HeaderField.PackageCipherId,
+                this.PackageCipherId);
+
+            stream.WriteHeader(HeaderField.PackageCompression,
+                ToBytes((uint)this.PackageCompression));
+
+            if (this.FileVersion < Version4)
+            {
+                stream.WriteHeader(HeaderField.AesKdfPassword, this.AesKdfPassword);
+                stream.WriteHeader(HeaderField.AesKdfIterations, ToBytes(this.AesKdfIterations));
+            }
+            else
+            {
+                stream.WriteHeader(HeaderField.KdfParameters, this.KdfParameters.Serialize());
+            }
+
+            if (this.PackageCipherIV.Length > 0)
+                stream.WriteHeader(HeaderField.PackageCipherIV, this.PackageCipherIV);
+
+            if (this.FileVersion < Version4)
+            {
+                stream.WriteHeader(HeaderField.RandomBytesCryptoKey, this.RandomByteGeneratorCryptoKey);
+                stream.WriteHeader(HeaderField.StreamStartByteMarker, this.StreamStartByteMarker);
+                stream.WriteHeader(HeaderField.RandomBytesCryptoType, ToBytes(this.RandomByteGeneratorCryptoType));
+            }
+
+            if (this.CustomData != null && this.CustomData.Count > 0)
+                stream.WriteHeader(HeaderField.PackageCustomData, this.CustomData.Serialize());
+
             stream.WriteHeader(HeaderField.EndOfHeader, marker);
         }
 
@@ -173,8 +240,19 @@ namespace NerdyMishka.Api.KeePass.Package
 
             HeaderField field = (HeaderField)fieldIdByte;
 
-            byte[] sizeBytes = input.ReadBytes(2);
-            ushort size = BitConverter.ToUInt16(sizeBytes, 0);
+            int size;
+            byte[] sizeBytes;
+            if ((uint)this.FileVersion < Version4)
+            {
+                sizeBytes = input.ReadBytes(2);
+                size = LittleEndianBitConverter.ToUInt16(sizeBytes);
+            }
+            else
+            {
+                sizeBytes = input.ReadBytes(4);
+                size = LittleEndianBitConverter.ToInt32(sizeBytes);
+            }
+
             byte[] data = null;
 
             if (size > 0)
@@ -188,39 +266,58 @@ namespace NerdyMishka.Api.KeePass.Package
                 case HeaderField.EndOfHeader:
                     return false;
 
-                case HeaderField.DatabaseCipherId:
-                    this.DatabaseCipherId = data;
+                case HeaderField.PackageCipherId:
+                    this.PackageCipherId = data;
                     break;
-                case HeaderField.DatabaseCompression:
+
+                case HeaderField.PackageCompression:
                     if (data.Length < 1)
                         throw new Exception("Invalid Header");
 
-                    this.DatabaseCompression = data[0];
+                    this.PackageCompression = (int)ToUInt32(data);
                     break;
-                case HeaderField.DatabaseCipherKeySeed:
-                    this.DatabaseCipherKeySeed = data;
+                case HeaderField.PackageCipherKey:
+                    this.PackageCipherKey = data;
                     break;
-                case HeaderField.MasterKeyHashSeed:
-                    this.MasterKeyHashKey = data;
+
+                case HeaderField.AesKdfPassword:
+                    this.AesKdfPassword = data;
+                    this.KdfParameters = this.KdfParameters ?? new KdfParameters(AesKdf.Id);
+                    this.KdfParameters.Add(AesKdf.KeyParameterName, data);
                     break;
-                case HeaderField.MasterKeyHashRounds:
-                    this.MasterKeyHashRounds = BitConverter.ToInt32(data, 0);
+
+                case HeaderField.AesKdfIterations:
+                    this.AesKdfIterations = (long)ToUInt64(data);
+                    this.KdfParameters = this.KdfParameters ?? new KdfParameters(AesKdf.Id);
+                    this.KdfParameters.Add(AesKdf.IterationsParameterName, this.AesKdfIterations);
                     break;
-                case HeaderField.DatabaseCipherIV:
-                    this.DatabaseCipherIV = data;
+
+                case HeaderField.PackageCipherIV:
+                    this.PackageCipherIV = data;
                     break;
+
                 case HeaderField.RandomBytesCryptoKey:
                     this.RandomByteGeneratorCryptoKey = data;
-
                     break;
-                case HeaderField.HeaderByteMark:
-                    this.HeaderByteMarks = data;
+
+                case HeaderField.StreamStartByteMarker:
+                    this.StreamStartByteMarker = data;
                     break;
 
                 case HeaderField.RandomBytesCryptoType:
                     if (data.Length < 1)
                         throw new Exception("Invalid Header");
-                    this.RandomByteGeneratorCryptoType = data[0];
+                    this.RandomByteGeneratorCryptoType = (int)ToUInt32(data);
+                    break;
+
+                case HeaderField.KdfParameters:
+                    this.KdfParameters = this.KdfParameters ?? new KdfParameters();
+                    this.KdfParameters.Deserialize(data);
+                    break;
+
+                case HeaderField.PackageCustomData:
+                    this.CustomData = this.CustomData ?? new VariantDictionary();
+                    this.CustomData.Deserialize(data);
                     break;
                 default:
                     return false;

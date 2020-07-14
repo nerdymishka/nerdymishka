@@ -52,7 +52,7 @@ namespace NerdyMishka.Api.KeePass.Serialization
                 var serializerContext = new SerializerContext()
                 {
                     RandomByteGenerator = package.HeaderInfo.RandomByteGenerator,
-                    DatabaseCompression = package.HeaderInfo.DatabaseCompression,
+                    DatabaseCompression = (byte)package.HeaderInfo.PackageCompression,
                     Mappings = this.Mappings,
                 };
 
@@ -99,6 +99,7 @@ namespace NerdyMishka.Api.KeePass.Serialization
                 {
                     RandomByteGenerator = package.HeaderInfo.RandomByteGenerator,
                     MemoryProtection = package.MetaInfo.MemoryProtection,
+                    DatabaseCompression = (byte)package.HeaderInfo.PackageCompression,
                     BinaryMap = map,
                     Mappings = this.Mappings,
                 };

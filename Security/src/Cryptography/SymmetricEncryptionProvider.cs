@@ -122,7 +122,7 @@ namespace NerdyMishka.Security.Cryptography
 #if NET461 || NET451
                         cs.Write(message, 0, message.Length);
 #else
-                        cs.Write(message);
+                        cs.Write(message.AsSpan());
 #endif
                         message.Clear();
                         cs.Flush();
@@ -377,7 +377,7 @@ namespace NerdyMishka.Security.Cryptography
 #if NET461 || NET451
                         ms.Write(encryptedBlob, 0, encryptedBlob.Length);
 #else
-                        ms.Write(encryptedBlob);
+                        ms.Write(encryptedBlob.AsMemory());
 #endif
                         encryptedBlob.Clear();
                         ms.Flush();

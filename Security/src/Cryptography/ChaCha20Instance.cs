@@ -1,3 +1,7 @@
+using System;
+using System.Buffers;
+using NerdyMishka.Util.Binary;
+
 namespace NerdyMishka.Security.Cryptography
 {
     internal static class ChaCha20Instance
@@ -14,14 +18,31 @@ namespace NerdyMishka.Security.Cryptography
 
             return (bytes, state, action) =>
             {
-                var mpd = (MemoryProtectedBytes)state;
-                var key = mpd.Key ?? defaultKey;
-                var iv = mpd.IV;
-                var transform = action == MemoryProtectionActionType.Encrypt ?
-                    s_instance.CreateEncryptor(key, iv) :
-                    s_instance.CreateEncryptor(key, iv);
+                var mpb = (MemoryProtectedBytes)state;
+                var key = defaultKey;
 
-                return transform.TransformFinalBlock(bytes.ToArray(), 0, bytes.Length);
+                // TODO: add ToBytes method that incorporates offset
+                var id = LittleEndianBitConverter.ToBytes(mpb.Id);
+                var iv = ArrayPool<byte>.Shared.Rent(12);
+                Array.Copy(id, 0, iv, 4, id.Length);
+
+                try
+                {
+                    var transform = action == MemoryProtectionActionType.Encrypt ?
+                        s_instance.CreateEncryptor(key, iv) :
+                        s_instance.CreateEncryptor(key, iv);
+
+                    var data = bytes.ToArray();
+                    var result = transform.TransformFinalBlock(bytes.ToArray(), 0, bytes.Length);
+                    Array.Clear(data, 0, data.Length);
+
+                    return result;
+                }
+                finally
+                {
+                    Array.Clear(id, 0, id.Length);
+                    ArrayPool<byte>.Shared.Return(iv);
+                }
             };
         }
 

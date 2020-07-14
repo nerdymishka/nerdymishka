@@ -8,11 +8,13 @@ namespace NerdyMishka.Api.KeePass.Package
 {
     public class AesCryptoStreamProvider : IKeePassCryptoStreamProvider
     {
-        public KeePassIdentifier Id => new KeePassIdentifier(new byte[]
+        public static KeePassIdentifier KdfId => new KeePassIdentifier(new byte[]
         {
             0x31, 0xC1, 0xF2, 0xE6, 0xBF, 0x71, 0x43, 0x50,
             0xBE, 0x58, 0x05, 0x21, 0x6A, 0xFC, 0x5A, 0xFF,
         });
+
+        public KeePassIdentifier Id => KdfId;
 
         [SuppressMessage("Security", "SCS0011:Weak CBC Mode", Justification = "KeePass does an encrypt then mac scheme.")]
         public Stream CreateCryptoStream(Stream stream, bool encrypt, byte[] key, byte[] iv)

@@ -41,13 +41,22 @@ namespace NerdyMishka.Api.KeePass.Package
             stream.Write(span);
         }
 
-        public static void WriteHeader(this Stream stream, HeaderField field, IReadOnlyList<byte> data)
+        public static void WriteHeader(this Stream stream, HeaderField field, ReadOnlyMemory<byte> data)
+        {
+            WriteHeader(stream, field, data.Span);
+        }
+
+        public static void WriteHeader(this Stream stream, HeaderField field, ReadOnlySpan<byte> span)
         {
             stream.WriteByte((byte)field);
-            var span = data.ToReadOnlySpan();
             ushort size = (ushort)span.Length;
             stream.Write(BitConverter.GetBytes(size));
             stream.Write(span);
+        }
+
+        public static void WriteHeader(this Stream stream, HeaderField field, IReadOnlyList<byte> data)
+        {
+            WriteHeader(stream, field, data.ToReadOnlySpan());
         }
 
         public static void WriteHeader(this Stream stream, HeaderField field, byte[] data)

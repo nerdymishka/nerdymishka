@@ -15,30 +15,30 @@ namespace NerdyMishka.Api.KeePass.Package
         Comment = 1,
 
         /// <summary> The UUID of the Cipher for the database.</summary>
-        DatabaseCipherId = 2,
+        PackageCipherId = 2,
 
         /// <summary>The database compression type (normal or g zipped).</summary>
-        DatabaseCompression = 3,
+        PackageCompression = 3,
 
         /// <summary>
         /// The seed used to generate the Cipher key.
         /// </summary>
-        DatabaseCipherKeySeed = 4,
+        PackageCipherKey = 4,
 
         /// <summary>
         /// The set used to generate bytes for the Cipher key.
         /// </summary>
-        MasterKeyHashSeed = 5,
+        AesKdfPassword = 5,
 
         /// <summary>
         /// The number of interations for the Encryption engine to execute.
         /// </summary>
-        MasterKeyHashRounds = 6,
+        AesKdfIterations = 6,
 
         /// <summary>
         /// The number of interations for the Encryption engine to execute.
         /// </summary>
-        DatabaseCipherIV = 7,
+        PackageCipherIV = 7,
 
         /// <summary>
         /// Random bytes header field.
@@ -48,11 +48,17 @@ namespace NerdyMishka.Api.KeePass.Package
         /// <summary>
         /// The header byte mark field.
         /// </summary>
-        HeaderByteMark = 9,
+        StreamStartByteMarker = 9,
 
         /// <summary>
         /// The random bytes cryptography type field.
         /// </summary>
         RandomBytesCryptoType = 10,
+
+        /// <summary>Key Derivation Function Parameters.</summary>
+        KdfParameters = 11,
+
+        /// <summary>Package level custom data e.g. variant dictionary.</summary>
+        PackageCustomData = 12,
     }
 }
