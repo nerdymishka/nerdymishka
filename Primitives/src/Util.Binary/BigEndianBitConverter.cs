@@ -94,6 +94,7 @@ namespace NerdyMishka.Util.Binary
             };
         }
 
+
         public static char ToChar(byte[] value)
         {
             Check.NotNullOrEmpty(nameof(value), value);

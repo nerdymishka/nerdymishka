@@ -18,6 +18,13 @@ namespace NerdyMishka.Util.Binary
             return (value << r) | (value >> (64 - r));
         }
 
+        [CLSCompliant(false)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ulong RotateRight64(ulong value, short r)
+        {
+            return (value >> r) | (value << (64 - r));
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static long RotateLeft64(long x, short r)
         {
