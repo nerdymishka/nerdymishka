@@ -7,6 +7,7 @@ using NerdyMishka.Util.Binary;
 
 namespace NerdyMishka.Security.Cryptography
 {
+    // https://blake2.net/blake2.pdf
     [SuppressMessage("", "CA1819:", Justification = "Byte[] for properties are required in crypto.")]
     public class Blake2b : HashAlgorithm
     {
@@ -60,7 +61,57 @@ namespace NerdyMishka.Security.Cryptography
 
         private int bufferOffset = 0;
 
-        public Blake2b(int hashLength)
+        public Blake2b(
+            ReadOnlySpan<byte> key,
+            ReadOnlySpan<byte> salt,
+            ReadOnlySpan<byte> personalization,
+            int hashLength = OutBytes)
+            : this(hashLength)
+        {
+            if (!key.IsEmpty)
+            {
+                if (key.Length > BufferSize)
+                    throw new ArgumentOutOfRangeException(
+                        nameof(key),
+                        $"key must not exceed {BufferSize} in length.");
+
+                this.key = new byte[key.Length];
+                key.CopyTo(this.key);
+            }
+
+            if (!salt.IsEmpty)
+            {
+                if (salt.Length != 16)
+                    throw new ArgumentOutOfRangeException(
+                        nameof(salt),
+                        $"key must be only 16 bytes in length.");
+
+                this.salt = new byte[salt.Length];
+                key.CopyTo(this.salt);
+            }
+
+            if (!personalization.IsEmpty)
+            {
+                if (personalization.Length != 16)
+                    throw new ArgumentOutOfRangeException(
+                        nameof(personalization),
+                        $"personalization must be only 16 bytes in length.");
+
+                this.personalization = new byte[personalization.Length];
+                key.CopyTo(this.personalization);
+            }
+
+            if (hashLength < 0 || hashLength > OutBytes)
+                throw new ArgumentOutOfRangeException(
+                    nameof(hashLength),
+                    $"hashLength ({hashLength}) must not exceed the total max size in bytes ({OutBytes})");
+
+            this.hashLength = hashLength;
+            this.HashSizeValue = hashLength * 8;
+            this.Initialize();
+        }
+
+        public Blake2b(int hashLength = OutBytes)
         {
             if (hashLength < 0 || hashLength > OutBytes)
                 throw new ArgumentOutOfRangeException(
@@ -69,6 +120,7 @@ namespace NerdyMishka.Security.Cryptography
 
             this.hashLength = hashLength;
             this.HashSizeValue = hashLength * 8;
+            this.Initialize();
         }
 
         public byte[] Salt
@@ -124,7 +176,7 @@ namespace NerdyMishka.Security.Cryptography
                     return;
                 }
 
-                if (value.Length > OutBytes)
+                if (value.Length > BufferSize)
                     throw new ArgumentOutOfRangeException(
                         nameof(this.Key),
                         $"Key must not exceed {BufferSize} in length.");

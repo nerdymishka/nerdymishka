@@ -31,9 +31,9 @@ function Add-NugetSource()
 
         
 
-        if(![string]::IsNullOrWhiteSpace($ConfigFile))
+        if (![string]::IsNullOrWhiteSpace($ConfigFile))
         {
-            if(!(Test-Path $ConfigFile))
+            if (!(Test-Path $ConfigFile))
             {
                 throw [IO.FileNotFoundException] $ConfigFile
             }
@@ -42,11 +42,11 @@ function Add-NugetSource()
             $pSet += "`"$ConfigFile`""
         }
 
-        if($PSCmdlet.ShouldProcess("dotet nuget add"))
+        if ($PSCmdlet.ShouldProcess("dotet nuget add"))
         {
-            if(![string]::IsNullOrWhiteSpace($Username))
+            if (![string]::IsNullOrWhiteSpace($Username))
             {
-                if(!$Password)
+                if (!$Password)
                 {
                     throw "Username requires a password";
                 }
@@ -60,10 +60,12 @@ function Add-NugetSource()
             }
 
             dotnet nuget add source @pSet
-        } else {
-            if(![string]::IsNullOrWhiteSpace($Username))
+        }
+        else
+        {
+            if (![string]::IsNullOrWhiteSpace($Username))
             {
-                if(!$Password)
+                if (!$Password)
                 {
                     throw "Username requires a password";
                 }
