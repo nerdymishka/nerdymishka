@@ -13,8 +13,8 @@
     <PackageTags>nerdymishka</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)/nerdymishka.ruleset</CodeAnalysisRuleSet>
-    <DotNetFrameworks Condition=" '$(DotNetFrameworks)' == '' ">netstandard2.0;netstandard2.1;net5</DotNetFrameworks>
-    <DotNetTestFrameworks Condition=" '$(DotNetTestFrameworks)' == '' ">netcoreapp2.1;netcoreapp3.1;net5</DotNetTestFrameworks>
+    <DotNetFrameworks Condition=" '$(DotNetFrameworks)' == '' ">netstandard2.1;net5</DotNetFrameworks>
+    <DotNetTestFrameworks Condition=" '$(DotNetTestFrameworks)' == '' ">netcoreapp3.1;net5</DotNetTestFrameworks>
   </PropertyGroup>
   
   

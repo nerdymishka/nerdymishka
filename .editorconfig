@@ -4,3 +4,5 @@ generated_code = true
 generated_code = true
 [*.Version.cs]
 generated_code = true
+
+[*.cs]
