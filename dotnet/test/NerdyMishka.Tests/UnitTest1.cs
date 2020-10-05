@@ -2,12 +2,10 @@ using System;
 
 namespace NerdyMishka.Tests
 {
-    public class UnitTest1
+    public static class UnitTest1
     {
-        
-        public void Test1()
+        public static void Test1()
         {
-
         }
     }
 }

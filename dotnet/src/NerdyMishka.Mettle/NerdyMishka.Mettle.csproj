@@ -26,7 +26,7 @@ Mettle enables:
     <DefineConstants>TRACE;XUNIT_FRAMEWORK</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(TargetFramework) == 'netstandard2.0|netstandard2.1|net5.0'">
+  <PropertyGroup Condition="$(TargetFramework) == 'netstandard2.0|netstandard2.1|net5.0|net5'">
     <DefineConstants>NETSTANDARD</DefineConstants>
   </PropertyGroup>
 

@@ -49,7 +49,7 @@ namespace Xunit
 
 #else
                         foreach (var name in AppDomain.CurrentDomain.GetAssemblies().Select(a => a?.GetName()?.Name))
-                            if (name != null && name.StartsWith(executionAssemblyNamePrefix, StringComparison.Ordinal))
+                            if (name != null && name.StartsWith(ExecutionAssemblyNamePrefix, StringComparison.Ordinal))
                             {
                                 platformSuffix = name.Substring(ExecutionAssemblyNamePrefix.Length);
                                 break;
