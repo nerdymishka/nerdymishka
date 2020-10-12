@@ -54,8 +54,12 @@ namespace NerdyMishka.Reflection
 
         public static Delegate CreateSetter(PropertyInfo propertyInfo)
         {
-            if (propertyInfo == null)
+            if (propertyInfo is null)
                 throw new ArgumentNullException(nameof(propertyInfo));
+
+            if (propertyInfo.SetMethod is null)
+                throw new ArgumentException(
+                    $"propertyInfo for {propertyInfo.DeclaringType?.FullName}.{propertyInfo.Name} does not have a set method");
 
             if (propertyInfo.SetMethod.IsStatic)
             {

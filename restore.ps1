@@ -1,7 +1,34 @@
 
 Set-Alias "psake" "invoke-psake"
 
-if ($null -eq (Get-Command nbgv -EA SilentlyContinue))
+$Env:DOCKER_DISK = "$HOME/.cache/docker_disk"
+
+$dd = $Env:DOCKER_DISK
+
+$paths = @(
+    "$dd",
+    "$dd/cache",
+    "$dd/etc",
+    "$dd/log",
+    "$dd/secrets",
+    "$dd/cache/mssql",
+    "$dd/log/mssql",
+    "$dd/cache/mysql",
+    "$dd/etc/mysql",
+    "$dd/cache/postgres",
+    "$dd/etc/postgres",
+    "$dd/cache/redis",
+    "$dd/etc/redis",
+    "$dd/cache/rabbitmq",
+    "$dd/etc/rabbitmq",
+    "$dd/log/rabbitmq",
+    "$dd/cache/mongo"
+)
+
+foreach($p in $paths)
 {
-    dotnet tool install -g nbgv --version 3.1.91
+    if(!(Test-Path $p))
+    {
+        New-Item $p -ItemType Directory 
+    }
 }
