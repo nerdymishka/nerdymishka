@@ -5,6 +5,10 @@
     "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
+    "material-icon-theme.folders.associations": {
+        "tf": "terraform",
+        "vscode": "vscode"
+    },
     "cSpell.words": [
         "Algo",
         "BSTR",
