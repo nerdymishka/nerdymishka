@@ -1,0 +1,79 @@
+{
+	"folders": [
+		{
+			"name": "docs",
+			"path": "docs"
+		},
+		{
+			"name": "nodejs",
+			"path": "node"
+		},
+		{
+			"name": "templates",
+			"path": "tpl"
+		},
+		{
+			"name": ".NET",
+			"path": "dnet"
+		},
+		{
+			"name": "powershell",
+			"path": "pwsh"
+		},
+		{
+			"name": "terraform",
+			"path": "tf"
+		},
+	],
+	"settings": {
+		"workbench.colorCustomizations": {
+			"[Default Dark+]": {
+				"editor.background": "#1f242859",
+				"sideBar.background": "#1f2428",
+				"panel.background": "#1f2428",
+				"badge.background": "#770686",
+				"menu.background": "#1f2428",
+				"titleBar.activeBackground": "#1f2428",
+				"tab.inactiveBackground": "#222222",
+				"tab.inactiveForeground": "#ffffff",
+				"tab.activeBackground": "#98e024",
+				"tab.activeForeground": "#000000",
+				"activityBar.background": "#1f2428",
+				"gitDecoration.untrackedResourceForeground": "#72a71d",
+				"symbolIcon.stringForeground": "#f4005f",
+				"symbolIcon.classForeground": "#ff0000"
+			},
+			"terminal.background": "#111118",
+			"terminal.ansiYellow": "#fd971f",
+			"terminal.ansiBlue": "#0655ff",
+			"terminal.ansiGreen": "#98e024",
+			"terminal.ansiBrightGreen": "#98e024",
+			"terminal.foreground": "#d9d9d9",
+			"terminal.ansiBrightYellow": "#fd971f",
+			"terminal.ansiBrightRed": "#f4005f",
+			"terminal.ansiRed": "#f4005f"
+		},
+		"editor.tokenColorCustomizations": {
+		   "[Default Dark+]": {
+			"types": "#7cc900",
+			"strings": "#f04ab0",
+			"functions": "#e0d561"
+		   }
+		},
+
+        "terminal.integrated.shell.windows": "C:/Program Files/Powershell/7/pwsh.exe",
+		"terminal.integrated.shellArgs.windows": [
+			"-NoExit",
+			"-ExecutionPolicy",
+			"Bypass",
+			"-File",
+			"${env:OneDrive}/profile.ps1"
+		  ],
+		"terminal.integrated.fontFamily": "Cascadia Code PL",
+		"editor.fontFamily": "Fira Code",
+		"editor.fontLigatures": true,
+		"editor.rulers": [80, 120],
+		"powershell.codeFormatting.preset": "Allman",
+		"powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+	}
+}

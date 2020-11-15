@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "vscode",
+			"path": ".",
+		},
+		{
+			"path": "../node",
+		},
+		{
+			"name": ".NET",
+			"path": "../.net"
+		},
+		{
+			"name": "powershell",
+			"path": "../pwsh"
+		}
+	],
+	"settings": {
+		"omnisharp.enableRoslynAnalyzers": true,
+		"powershell.codeFormatting.preset": "Allman",
+		"powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+	}
+}
