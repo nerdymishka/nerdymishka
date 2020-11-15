@@ -23,7 +23,7 @@
 		{
 			"name": "terraform",
 			"path": "tf"
-		},
+		}
 	],
 	"settings": {
 		"workbench.colorCustomizations": {
@@ -57,7 +57,7 @@
 		   "[Default Dark+]": {
 			"types": "#7cc900",
 			"strings": "#f04ab0",
-			"functions": "#e0d561"
+			"functions": "#c5f006"
 		   }
 		},
 
