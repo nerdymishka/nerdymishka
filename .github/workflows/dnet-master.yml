@@ -1,0 +1,15 @@
+name: dotnet-cd
+on: 
+  push: 
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "checkout"
+        run: |
+          git clone https://github.com/nerdymishka/nerdymishka.git --no-checkout $GITHUB_WORKSPACE/nm-dnet
+          git sparse-checkout init --cone 
+          git sparse-checkout set dnet
