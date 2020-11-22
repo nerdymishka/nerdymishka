@@ -24,7 +24,24 @@ jobs:
         shell: pwsh
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer, Psake
+          $mods = @(
+            "Psake",
+            "PSScriptAnalyzer"
+          )
+          $available = Get-Module $mods -ListAvailable 
+          $installList = @();
+          foreach($mod in $mods)
+          {
+             $hasModule = $mods | Where-Object { $_.Name -eq $mod }
+             if(!$hasModule)
+             {
+               $installList += $mod 
+             }
+          }
+
+          Write-Host $installList
+
+          Install-Module $installList
       - name: "checkout"
         shell: pwsh
         run: |
