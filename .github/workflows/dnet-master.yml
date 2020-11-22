@@ -8,14 +8,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: "checkout"
+      - name: set:env
         run: |
-          git clone https://github.com/nerdymishka/nerdymishka.git --no-checkout "$GITHUB_WORKSPACE/nm-dnet"
-          cd "$GITHUB_WORKSPACE/nm-dnet"
+          echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "GIT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+          echo "GWD=${GITHUB_WORKSPACE}/nm-${GIT_BRANCH}"
+      - name: verify:env
+        run: |
+          echo ${GITHUB_BRANCH}
+          echo ${GWD}
+      - name: "checkout"
+        shell: pwsh
+        run: |
+          git clone https://github.com/nerdymishka/nerdymishka.git --branch $ENV:GIT_BRANCH `
+            --single-branch --no-checkout  "$($Env:GWD)"
+          Set-Location $GWD 
           git fetch origin
           git sparse-checkout init --cone 
           git sparse-checkout set dnet
+          git checkout "$($Env:GIT_BRANCH)"
       - name: "require-dotnet"
       - uses: actions/setup-dotnet@v1
         with:
