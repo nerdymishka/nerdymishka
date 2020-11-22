@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace NerdyMishka
 {
+
     [AttributeUsage(AttributeTargets.Parameter, Inherited = false, AllowMultiple = false)]
     public sealed class ValidatedNotNullAttribute : Attribute
     {
