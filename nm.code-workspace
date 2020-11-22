@@ -7,7 +7,7 @@
 		{
 			"name": "github",
 			"path": ".github"
-		}
+		},
 		{
 			"name": "nodejs",
 			"path": "node"
