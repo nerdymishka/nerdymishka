@@ -10,6 +10,6 @@ jobs:
     steps:
       - name: "checkout"
         run: |
-          git clone https://github.com/nerdymishka/nerdymishka.git --no-checkout $GITHUB_WORKSPACE/nm-dnet
+          git clone https://github.com/nerdymishka/nerdymishka.git --no-checkout "$GITHUB_WORKSPACE/nm-dnet"
           git sparse-checkout init --cone 
           git sparse-checkout set dnet
