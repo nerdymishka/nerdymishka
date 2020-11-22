@@ -17,7 +17,7 @@ jobs:
           echo "GWD2=${GITHUB_WORKSPACE}/nm-${GIT_REF##*/}" >> $GITHUB_ENV
       - name: set:gwd
         run: |
-          echo "GWD=${GITHUB_WORKSPACE}/nm-${GIT_BRANCH}" >> $GITHUB_ENV"
+          echo "GWD=${GITHUB_WORKSPACE}/nm-${GIT_BRANCH}" >> $GITHUB_ENV
       - name: verify:env
         run: |
           echo ${GITHUB_BRANCH}
