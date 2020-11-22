@@ -28,7 +28,9 @@ jobs:
         run: |
           git clone https://github.com/nerdymishka/nerdymishka.git --branch $ENV:GIT_BRANCH `
             --single-branch --no-checkout  "$($Env:GWD)"
-          Set-Location $GWD 
+          echo $GWD 
+          Set-Location "$(Env:GWD)"
+          echo (Get-Location)
           git sparse-checkout init --cone 
           git sparse-checkout set dnet
           git checkout "$($Env:GIT_BRANCH)"
