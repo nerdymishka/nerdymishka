@@ -1,0 +1,19 @@
+{
+    "toc": {
+        "scope": "yml,yaml",
+        "prefix": "toc-initial",
+        "body": [
+            "items:",
+            "  - name: ${TM_FILEPATH/.*\\\\(.*)\\\\(.*)$/${1:/capitalize}/gm}",
+            "    href: index.md"
+        ]
+    },
+    "toc-node": {
+        "scope": "yml,yaml",
+        "prefix": "toc-node",
+        "body": [
+            "  - name: ${1:name}",
+            "    href: ${2:href}"
+        ]
+    }
+}

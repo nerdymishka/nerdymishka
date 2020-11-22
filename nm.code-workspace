@@ -77,6 +77,13 @@
 		"editor.formatOnType": true,
 		"editor.formatOnPaste": true,
 		"powershell.codeFormatting.preset": "Allman",
-		"powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline"
+		"powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
+		"grammarly.userWords": [
+			"changefreq"
+		],
+		"cSpell.words": [
+			"Herndon",
+			"michaelherndon"
+		]
 	}
 }
