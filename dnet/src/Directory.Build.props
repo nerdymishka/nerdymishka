@@ -1,0 +1,12 @@
+
+
+<Project>
+	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+	<PropertyGroup Condition="$(Configuration) == 'Release'">
+		<CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)../nm-release.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Configuration) == 'Debug'">
+		<CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)../nm-debug.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+</Project>

@@ -4,7 +4,7 @@
     <Description Condition=" '$(Description)' == '' ">$(PackageId)</Description>
     <Product Condition=" '$(Product)' == '' ">$(AssemblyName)</Product>
     <Version Condition=" '$(Version)' == '' ">0.1.0</Version>
-    <Company>NerdyMishka</Company>
+    <Company>Nerdy Mishka</Company>
     <Authors>Michael Herndon</Authors>
     <!-- <PackageIcon>logo.png</PackageIcon>-->
     <PackageIconUrl>http://logo.nerdyishka.com</PackageIconUrl>
@@ -12,10 +12,11 @@
     <Copyright>NerdyMishka © 2016 - 2020</Copyright>
     <PackageTags>nerdymishka</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)/nerdymishka.ruleset</CodeAnalysisRuleSet>
+  
     <DotNetFrameworks Condition=" '$(DotNetFrameworks)' == '' ">net5</DotNetFrameworks>
     <DotNetTestFrameworks Condition=" '$(DotNetTestFrameworks)' == '' ">net5</DotNetTestFrameworks>
   </PropertyGroup>
+
   
   <ItemGroup Condition="'$(Analyzers)' != 'false'">
     <PackageReference Include="SecurityCodeScan" Version="3.4.0" />
