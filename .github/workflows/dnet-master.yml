@@ -14,15 +14,13 @@ jobs:
         run: |
           echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "GIT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          echo "GWD2=${GITHUB_WORKSPACE}/nm-${GIT_REF##*/}" >> $GITHUB_ENV
       - name: set:gwd
         run: |
           echo "GWD=${GITHUB_WORKSPACE}/nm-${GIT_BRANCH}" >> $GITHUB_ENV
       - name: verify:env
         run: |
-          echo ${GITHUB_BRANCH}
+          echo ${GIT_BRANCH}
           echo ${GWD}
-          echo ${GWD2}
       - name: "checkout"
         shell: pwsh
         run: |
@@ -38,3 +36,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: "5.0.x"
+      - name: "verify:modules"
+        shell: pwsh
+        run: |
+          Get-Module -ListAvailable
