@@ -8,8 +8,6 @@
 import React, { Children, useState } from "react"
 import PropTypes, { node } from "prop-types"
 import { useStaticQuery, graphql } from "gatsby"
-import ReactGA from 'react-ga';
-import CookieConsent, { Cookies } from 'react-cookie-consent';
 import "./../scss/theme.scss"
 import { faWindowAlt } from "@fortawesome/pro-duotone-svg-icons";
 import { querySiteData } from "../queries/query-site-data";
@@ -31,7 +29,7 @@ export interface LayoutProps
 }
 
 
-export default function Layout (props: LayoutProps) {
+export default function LayoutTwoColumn (props: LayoutProps) {
     const { title, description } = querySiteData()
 
     return (
@@ -39,9 +37,12 @@ export default function Layout (props: LayoutProps) {
             <Header />
             <div className="main wrapper">
                 <Container>
-                    <main>
+                    <main className="col-8">
                         {props.children}
                     </main>
+                    <div className="col-4">
+                        {props.widgets}
+                    </div>
                 </Container>
             </div>
             <Footer />
@@ -49,6 +50,6 @@ export default function Layout (props: LayoutProps) {
     )
 }
 
-Layout.propTypes = {
+LayoutTwoColumn.propTypes = {
     children: PropTypes.node.isRequired,
 }

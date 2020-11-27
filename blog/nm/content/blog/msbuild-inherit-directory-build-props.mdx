@@ -1,0 +1,79 @@
+---
+title: Msbuild Inherit Directory Build props
+uid: nm:/blog/msbuild-inherit-directory-build-props.mdx
+slug: blog/msbuild-inherit-directory-build-props
+keywords: msbuild directory.build.props
+description: |
+   How to nest or inherit Directory.Build.props files for .NET 
+author: michael-herndon
+date: 2020-11-27T08:54:20
+status: draft
+lang: en
+categories: ["build"]
+tags: ["build", "ci", "cd", "msbuild", ".net", "dotnet"]
+classification: public
+---
+
+Microsoft Build ("<abbr title="Microsoft Build">msbuild</abbr>") now ships the
+feature where special project root files **Directory.Build.props** and
+**Directory.Build.targets** are applied for all the projects discovered in
+inherited folders.
+
+By default, once msbuild find one file with each suffix, it stops processing
+all ancestor folders for additional files with the same name. Thus nested or 
+inherited Directory.Build.x files are not supported out of the box. 
+
+To enable nested or inherited Directory.Build.x the `<Import />` directive 
+must be used in child files.  The [msbuild documentation][ms-docs] covers
+how to do this without notating that the `<Import />` directive must be
+within the `<Project></Project>` element which may be confusing if you're
+just starting to dig into customizing msbuild projects.
+
+## Single Level Example 
+
+Lets say you want to enable different build properties for **src** and **test**
+directories for your project as outlined below for different Rosalyn analyzer
+rule sets:
+
+- project
+  - Directory.Build.props  
+  - src 
+    - Directory.Build.props
+    - ProjectA 
+  - test 
+    - Directory.Build.props 
+    - ProjectA.Tests 
+
+In Directory.Build.prop files in the child directory, the key item to add is 
+the `<Import />` directive inside the `<Project>` element with an 
+`[MsBuild]` function to get the file path of the ancestor folder above the
+current directory. 
+
+Functions in msbuild projects are called similar to static functions in PowerShell,
+with the type wrapped in square brackets followed by a double colon and then 
+paren with arguments e.g. `[Type]::Method('arg1', '$(BuildProp1)')`
+
+```xml
+<Project>
+   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+</Project>
+```
+
+Once the above is set, you can import the base props or target file(s) and add 
+any overrides or addition properties for the child file.  
+
+```xml
+<Project>
+	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+	<PropertyGroup Condition="$(Configuration) == 'Release'">
+		<CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)../nm-release.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Configuration) == 'Debug'">
+		<CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)../nm-debug.ruleset</CodeAnalysisRuleSet>
+	</PropertyGroup>
+</Project>
+```
+
+
+[msbuild-docs]: https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build?view=vs-2019

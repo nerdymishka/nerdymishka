@@ -1,0 +1,33 @@
+{
+    "blog-meta": {
+        "scope": "markdown,text.html.markdown.jsx",
+        "prefix": "blog-meta",
+        "body": [
+            "---",
+            "title: ${TM_FILENAME_BASE/(\\w*)(-)/${1:/capitalize}${2:+ }/g}",
+            "uid: nm:${TM_FILEPATH/((.*)(blog))?([\\\\|\\/])([\\w-]*)/${4:+/}${5:/downcase}/gi}",
+            "slug: blog/${TM_FILENAME_BASE}",
+            "keywords: ",
+            "description: |",
+            "  ${2:description}",
+            "author: $3",
+            "date: $4",
+            "status: ${5|draft,reviewed,approved,published|}",
+            "lang: en",
+            "categories: []",
+            "tags: []",
+            "classification: ${6|sensitive,confidential,private,public|}",
+            "---"
+        ]
+    },
+    "date": {
+        "scope": "yaml,yml",
+        "prefix": "date",
+        "body": "${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}T${CURRENT_HOUR}:${CURRENT_MINUTE}:${CURRENT_SECOND}"
+    },
+    "mh-author": {
+        "scope": "yaml,yml",
+        "prefix": "author-mh",
+        "body": "michaelherndon"
+    }
+}
