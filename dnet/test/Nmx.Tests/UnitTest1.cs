@@ -1,14 +1,15 @@
 using System;
-using Xunit;
+using System.Diagnostics.CodeAnalysis;
+using Mettle;
 
-namespace Nmx.Tests
+namespace Tests
 {
     public class UnitTest1
     {
-        [Fact]
-        public void Test1()
+        [UnitTest]
+        public void Test1([NotNull] IAssert assert)
         {
-
+            assert.True("x".Equals("x"));
         }
     }
 }
