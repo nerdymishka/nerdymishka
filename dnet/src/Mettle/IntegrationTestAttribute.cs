@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Xunit.Sdk;
 
 namespace Mettle
@@ -7,7 +8,9 @@ namespace Mettle
     {
         public IntegrationTestAttribute()
         {
-            this.Tags = this.Tags ?? "integration";
+            this.Tags ??= "integration";
         }
+
+        public OSPlatform[] Platforms { get; set; }
     }
 }

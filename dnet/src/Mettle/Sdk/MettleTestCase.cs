@@ -191,8 +191,6 @@ namespace Mettle.Xunit.Sdk
                 string id = factAttribute.GetNamedArgument<string>("Id");
                 string ticket = factAttribute.GetNamedArgument<string>("Ticket");
                 string tags = factAttribute.GetNamedArgument<string>("Tags");
-                
-                
 
                 if (!string.IsNullOrWhiteSpace(id))
                     Traits.Add("id", id);

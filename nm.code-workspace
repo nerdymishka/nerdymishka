@@ -85,12 +85,14 @@
 		"powershell.codeFormatting.preset": "Allman",
 		"powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
 		"grammarly.userWords": [
+			"Pwsh",
 			"changefreq"
 		],
 		"cSpell.words": [
 			"Herndon",
 			"Mishka",
-			"michaelherndon"
+			"michaelherndon",
+			"pwsh"
 		]
 	}
 }
