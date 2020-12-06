@@ -9,7 +9,7 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule           = './Nmx.Pwsh.SavePoint.psm1'
+    RootModule           = './Nmx.Pwsh.Environment.psm1'
 
     # Version number of this module.
     ModuleVersion        = '0.1.0'
@@ -31,9 +31,14 @@
 
     # Description of the functionality provided by this module
     Description          = '
-A powershell module for tracking save points for procedural scripts such
-as device configuration changes where a task should only be invoked if
-it has not completed or certain conditions have not been met.
+A powershell module for working with environment variables.  This module
+can set environment variables for:
+
+- Azure DevOps and Github actions
+- Windows and Linux machine and user level variables.
+- Backwards compatible variables for powershell 5.1. e.g. IsWindows, IsCoreCLR
+- NMX prefixed variables for normalized cross platform use such as
+  NMX_HOME, NMX_HOME_CONFIG, NMX_DOCUMENTS, NMX_HOSTNAME, NMX_USER, etc
 '
 
     # Minimum version of the PowerShell engine required by this module
@@ -74,11 +79,11 @@ it has not completed or certain conditions have not been met.
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
     FunctionsToExport    = @(
-        'Get-SaveStateFileName',
-        'Read-SaveState',
-        'Set-SaveStateFileName',
-        'Sync-SavePoint',
-        'Write-SaveState'
+        'Add-Path',
+        'Set-BuildEnvironmentVar',
+        'Set-EnvironmentVar',
+        'Set-GlobalcompatibilityVar',
+        'Set-NmxEnviromentVar'
     )
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -88,7 +93,7 @@ it has not completed or certain conditions have not been met.
     VariablesToExport    = ''
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport      = @('Save-Point')
+    AliasesToExport      = @()
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -105,13 +110,13 @@ it has not completed or certain conditions have not been met.
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags         = @('save', 'save-point', 'check-point', 'savepoint')
+            Tags         = @('env', 'variable', 'enviroment', 'env-variable', "enviroment-variable", "build")
 
             # A URL to the license for this module.
             LicenseUri   = 'https://www.apache.org/licenses/LICENSE-2.0'
 
             # A URL to the main website for this project.
-            ProjectUri   = 'https://github.com/nerdymishka/nerdymishka/tree/master/pwsh/Nmx.Pwsh.SavePoint/README.md'
+            ProjectUri   = 'https://github.com/nerdymishka/nerdymishka/tree/master/pwsh/Nmx.Pwsh.Environment/README.md'
 
             # A URL to an icon representing this module.
             IconUri      = 'https://raw.githubusercontent.com/nerdymishka/nerdymishka/master/pwsh/assets/logo.png'

@@ -29,6 +29,7 @@ Describe 'Nmx.Pwsh.SavePoint' {
     }
 
     It "Should set a default filename" {
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $default = "$HOME/.config/nmx/pwsh/save-points.json".Replace("\", "/")
        
         Set-SaveStateFileName $local -Force 
@@ -58,11 +59,13 @@ Describe 'Nmx.Pwsh.SavePoint' {
     It "Should run a task if a save-point does not exist" {
         $g = $false 
         Sync-SavePoint '1' {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $g = $true 
         }
         $g | Should Be $false 
 
         Sync-SavePoint '2' {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $g = $true
 
             return $null
@@ -85,13 +88,42 @@ Describe 'Nmx.Pwsh.SavePoint' {
 
             $Name | Should Be '4'
             $State['3']['n'] | Should Be 'test'
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $g = $true 
             return $null
         }
 
         $g | Should Be $true 
     }
-   
+     
+    It "Should allow dot path for names of tasks" {
+        $g = $false 
+        Sync-SavePoint "org.tech.dept" {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $g = $true 
+            return @{
+                'name' = 'tech'
+                'updatedAt' = [DateTime]::UtcNow
+            }
+        }
+
+        $g | Should Be $true 
+        $state = Read-SaveState
+        $state['org'] | Should not be $null 
+        $state['org']['tech'] | Should not be $null 
+        $state['org']['tech']['dept'] |  Should Not Be $null 
+        $state['org']['tech']['dept']['name'] | Should Be 'tech'
+
+        $g = $false 
+        Sync-SavePoint "org.tech.dept" {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $g = $true 
+            return $null 
+        } 
+
+        $g | Should Be $false 
+        $state['org']['tech']['dept']['name'] | Should Be 'tech'
+    }
 
     try 
     {

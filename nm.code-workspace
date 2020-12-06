@@ -64,6 +64,7 @@
 				"functions": "#c5f006"
 			}
 		},
+		"powershell.scriptAnalysis.settingsPath": "./pwsh/PSScriptAnalyzerSettings.psd1",
 		"terminal.integrated.shell.windows": "C:/Program Files/Powershell/7/pwsh.exe",
 		"terminal.integrated.shellArgs.windows": [
 			"-NoExit",
