@@ -87,13 +87,17 @@
 		"powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
 		"grammarly.userWords": [
 			"Pwsh",
-			"changefreq"
+			"changefreq",
+			"commandline",
+			"vswhere"
 		],
 		"cSpell.words": [
 			"Herndon",
 			"Mishka",
+			"commandline",
 			"michaelherndon",
-			"pwsh"
+			"pwsh",
+			"vswhere"
 		]
 	}
 }

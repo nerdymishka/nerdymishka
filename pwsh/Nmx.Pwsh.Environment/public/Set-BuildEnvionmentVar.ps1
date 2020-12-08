@@ -34,7 +34,7 @@ function Set-BuildEnvironmentVar()
                 Write-Debug "Setting $Name for github actions"
             }
 
-            Write-Output "$Name=$Value" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+            "$Name=$Value" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
         }
 
         if ($env:TF_BUILD)
@@ -44,7 +44,7 @@ function Set-BuildEnvironmentVar()
                 Write-Debug "Setting $Name for azure devops"
             }
 
-            Write-Output "##vso[task.setvariable variable=$Name]$Value"
+            Write-Host "##vso[task.setvariable variable=$Name]$Value"
         }
 
         [Environment]::SetEnvironmentVariable($Name, $Value, [System.EnvironmentVariableTarget]::Process)

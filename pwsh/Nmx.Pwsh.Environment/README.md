@@ -31,18 +31,18 @@ Linux.
 
 Setting machine and user variables on Mac are not currently supported.
 
-For machine and user variables on linux, it will attempt to update files
+For machine and user variables on Linux, it will attempt to update files
 if they exist:
 
-- it will attempt to update /etc/environment for machine level variables
-- it will attempt to update the a profile file in the following order; .zprofile,
+- it will attempt to update /etc/environment for machine-level variables
+- it will attempt to update the profile file in the following order; .zprofile,
   .bash_profile, and then .profile
 
 ## NMX Variables
 
-Calling `Set-NmxEnvironmentVar` will set pre-determined in-process environment
-variables that are cross platform.  The function is meant to be called as needed
-or as part of powershell profile script.
+Calling `Set-NmxEnvironmentVar` will set the predetermined in-process environment
+variables that are cross-platform.  The function is meant to be called as needed
+or as a part of a PowerShell profile script.
 
 Many of the NMX prefixed environment variables are meant to append an application
 or powershell module name after the variable.
@@ -90,7 +90,7 @@ if ($od) { $od = $od.replace("\", "/") }
 
 ### NMX Variables on Windows
 
-The windows NMX variables map many of values to `ProgramData` or `LOCALAPPDATA`
+The windows NMX variables map many values to `ProgramData` or `LOCALAPPDATA`
 where appending the application name to the value is important to working how
 windows intends programs to store their data in an application sub folder.
 

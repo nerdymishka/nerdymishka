@@ -21,12 +21,17 @@ function Set-GlobalCompatibilityVar()
 
     if ($IsWindows)
     {
-        $global:IsProcessElevated = [Security.Principal.WindowsIdentity]::GetCurrent().Owner.IsWellKnown("BuiltInAdministratorsSid")
+        $global:IsElevatedProcess = [Security.Principal.WindowsIdentity]::GetCurrent().Owner.IsWellKnown("BuiltInAdministratorsSid")
     }
     else
     {
-        $global:IsProcessElevated = 0 -eq (id -u)
+        $global:IsElevatedProcess = 0 -eq (id -u)
     }
+    
+    $global:Is64BitProcess = [Environment]::Is64BitProcess
+    $global:Is64BitOs = [Environment]::Is64BitOperatingSystem
 
-    Write-Debug ("IsProcessElevated".PadRight(40) + $Global:IsProcessElevated)
+    Write-Debug ("IsElevatedProcess".PadRight(40) + $global:IsElevatedProcess)
+    Write-Debug ("Is64BitProcess".PadRight(40) + $global:Is64BitProcess)
+    Write-Debug ("Is64BitOs".PadRight(40) + $global:Is64BitOs)
 }

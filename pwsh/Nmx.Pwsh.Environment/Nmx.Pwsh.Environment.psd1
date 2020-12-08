@@ -18,7 +18,7 @@
     CompatiblePSEditions = @('Desktop', 'Core')
 
     # ID used to uniquely identify this module
-    GUID                 = 'd54a373a-7797-47bd-bfcf-887d7d04533f'
+    GUID                 = '95de63c9-3f48-480d-b012-66142866ad52'
 
     # Author of this module
     Author               = 'Michael Herndon'
