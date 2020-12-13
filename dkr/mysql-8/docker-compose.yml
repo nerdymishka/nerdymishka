@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  mysql:
+    restart: always
+    image: mysql:8.0
+    container_name: "mysql"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - "MYSQL_DATABASE=${NMX_MYSQL_DB}"
+      - "MYSQL_USER=${NMX_MYSQL_USER}"
+      - "MYSQL_ROOT_PASSWORD=${NMX_MYSQL_ROOT_PASSWORD}"
+      - "MYSQL_PASSWORD=${NMX_MYSQL_PASSWORD}"
+    ports: 
+      - "3306:3306"
+    networks:
+      backend:
+        ipv4_address: 172.6.1.5
+    volumes:
+      - "${NMX_DKR}/data/mysql:/var/lib/mysql"
+      - "${NMX_DKR}/etc/mysql:/etc/mysql/conf.d"
+      - "${NMX_DKR}/log/mysql:/var/log/mysql"
+
+networks:
+  backend:
+    external:
+      name: nmx-backend-vnet

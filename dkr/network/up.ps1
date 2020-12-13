@@ -1,0 +1,1 @@
+sudo docker-compose -f "$PsScriptRoot/docker-compose.yml"  up

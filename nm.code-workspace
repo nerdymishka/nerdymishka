@@ -1,6 +1,10 @@
 {
 	"folders": [
 		{
+			"name": "docker",
+			"path": "dkr"
+		},
+		{
 			"name": "docs",
 			"path": "docs"
 		},

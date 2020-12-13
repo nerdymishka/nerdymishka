@@ -1,0 +1,21 @@
+version: "3.7"
+services: 
+  hello_world:
+    image: hello-world:latest
+    networks: 
+      frontend:
+        ipv4_address: 172.5.0.255
+      backend:
+        ipv4_address: 172.6.0.255
+              
+networks:
+  frontend: 
+    name: nmx-frontenv-vnet
+    ipam:
+      config: 
+       - subnet: 172.5.0.0/16
+  backend:
+    name: nmx-backend-vnet
+    ipam:
+      config: 
+       - subnet: 172.6.0.0/16
