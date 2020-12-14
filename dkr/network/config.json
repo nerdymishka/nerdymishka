@@ -1,0 +1,11 @@
+{
+    "env": {
+        "NMX_FRONTEND_SUBNET": "172.5.0.0/16",
+        "NMX_BACKEND_SUBNET": "172.6.0.0/16",
+        "NMX_FRONTEND_HW_IPV4": "172.5.0.255",
+        "NMX_BACKEND_HW_IPV4": "172.6.0.255"
+    },
+    "compose": {
+        "default": "docker-compose.yml"
+    }
+}

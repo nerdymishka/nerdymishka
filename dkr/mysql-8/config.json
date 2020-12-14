@@ -1,0 +1,17 @@
+{
+    "env": {
+        "NMX_MYSQL_IPV4": "172.6.1.5",
+        "NMX_MYSQL_DB": "nmx_default",
+        "NMX_MYSQL_USER": "nmx",
+        "NMX_MYSQL_ROOT_PASSWORD": "::password",
+        "NMX_MYSQL_PASSWORD": "::password"
+    },
+    "directories": [
+        "data",
+        "data/mysql",
+        "etc",
+        "etc/mysql",
+        "log",
+        "log/mysql"
+    ]
+}

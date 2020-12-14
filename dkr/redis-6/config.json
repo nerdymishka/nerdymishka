@@ -1,0 +1,14 @@
+{
+    "env": {
+        "NMX_REDIS_IPV4": "172.6.1.20",
+        "NMX_REDIS_PASSWORD": "::password"
+    },
+    "directories": [
+        "data",
+        "data/redis",
+        "etc",
+        "etc/redis",
+        "log",
+        "log/redis"
+    ]
+}

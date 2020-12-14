@@ -1,0 +1,25 @@
+version: '3.7'
+services:
+  nginx_default: 
+    image: "nmx-nginx:latest"
+    container_name: "nmx-nginx"
+    restart: unless-stopped
+    ports:
+      - "80:80" # for redirect purposes
+      - "443:443"
+    volumes:
+      - ${NMX_DKR}/log/nginx:/var/log/nginx
+      - ${NMX_DKR}/etc/nginx:/etc/nginx
+    networks:
+      frontend:
+        ipv4_address: ${NMX_NGINX_FE_IPV4}
+      backend:
+        ipv4_address: ${NMX_NGINX_BE_IPV4} 
+
+networks:
+  frontend:
+    external:
+      name: nmx-frontend-vnet
+  backend:
+    external:
+      name: nmx-backend-vnet

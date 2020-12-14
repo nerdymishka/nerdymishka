@@ -1,0 +1,12 @@
+{
+    "env": {
+        "NMX_NGINX_FE_IPV4": "172.5.0.5",
+        "NMX_NGINX_BE_IPV4": "172.6.0.5"
+    },
+    "directories": [
+        "etc",
+        "etc/nginx",
+        "log",
+        "log/nginx"
+    ]
+}

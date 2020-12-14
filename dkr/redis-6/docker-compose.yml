@@ -1,0 +1,22 @@
+version: '3.7'
+services:
+  redis_default: 
+    image: "redis:6.0"
+    container_name: "redis-6-default"
+    restart: unless-stopped
+    command: redis-server --requirepass ${NMX_REDIS_PASSWORD}
+    environment:
+        - REDIS_REPLICATION=master
+    ports:
+      - "6379:6379"
+    volumes:
+      - ${NMX_DKR}/data/redis:/data
+      - ${NMX_DKR}/etc/redis:/usr/local/etc/redis
+    networks:
+      backend:
+        ipv4_address: ${NMX_REDIS_IPV4} 
+
+networks:
+  backend:
+    external:
+      name: nmx-backend-vnet
