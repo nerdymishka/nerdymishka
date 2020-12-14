@@ -5,10 +5,10 @@
     },
     "directories": [
         "data",
-        "data/redis",
+        "data/redis_6",
         "etc",
-        "etc/redis",
+        "etc/redis_6",
         "log",
-        "log/redis"
+        "log/redis_6"
     ]
 }

@@ -1,0 +1,13 @@
+{
+    "env": {
+        "NMX_VAULT_IPV4": "172.6.1.40"
+    },
+    "directories": [
+        "data",
+        "data/vault_1",
+        "etc",
+        "etc/vault_1",
+        "log",
+        "log/vault_1"
+    ]
+}

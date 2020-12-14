@@ -17,9 +17,9 @@ services:
       backend:
         ipv4_address: ${NMX_MYSQL_IPV4}
     volumes:
-      - "${NMX_DKR}/data/mysql:/var/lib/mysql"
-      - "${NMX_DKR}/etc/mysql:/etc/mysql/conf.d"
-      - "${NMX_DKR}/log/mysql:/var/log/mysql"
+      - "${NMX_DKR}/data/mysql_8:/var/lib/mysql"
+      - "${NMX_DKR}/etc/mysql_8:/etc/mysql/conf.d"
+      - "${NMX_DKR}/log/mysql_8:/var/log/mysql"
 
 networks:
   backend:

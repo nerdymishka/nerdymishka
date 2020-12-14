@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  mssql_2019:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql-2019
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${NMX_MSSQL_PASSWORD}
+      - MSSQL_PID=${NMX_MSSQL_PID}
+    ports:
+      - "1433:1433"
+    volumes:
+      - ${NMX_DKR}/data/mssql_2019:/var/opt/mssql/data
+    networks:
+      backend:
+        ipv4_address: ${NMX_MSSQL_IPV4} 
+
+networks:
+  backend:
+    external:
+      name: nmx-backend-vnet

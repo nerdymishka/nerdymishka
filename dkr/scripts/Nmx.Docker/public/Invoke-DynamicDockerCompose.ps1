@@ -109,8 +109,8 @@ function Invoke-DynamicDockerCompose()
                 else 
                 {
                     sudo mkdir $next 
-                    sudo chown root:docker $next 
-                    sudo chmod 755 $next 
+                    sudo chown root:root $next 
+                    sudo chmod 775 $next 
                 }
                
             }
@@ -162,6 +162,51 @@ function Invoke-DynamicDockerCompose()
     else
     {
         $useEnv = $true;
+    }
+
+    if ($config.cp)
+    {
+        $dests = @("etc/", "data/", "log/")
+        foreach ($set in $config.cp)
+        {
+            if ($set.src -and $set.dest)
+            {
+                $src = $set.src
+                if ($set.src.StartsWith("assets/"))
+                {
+                    $src = "$d/$src"
+                }
+                $dest = $set.dest;
+                $seg = $dest.Substring(0, $dest.IndexOf('/') + 1)
+                if ($dests.Contains($seg))
+                {
+                    $dest = "$base/$dest"
+                }
+
+                if ($src.Contains("*"))
+                {
+                    if ($IsWindows)
+                    {
+                        cp $src $dest -Recurse 
+                    }
+                    else
+                    {
+                        sudo cp -R $src $dest 
+                    }
+                }
+                else
+                {
+                    if ($IsWindows)
+                    {
+                        cp $src $dest 
+                    }
+                    else 
+                    {
+                        sudo cp $src $dest
+                    }
+                }
+            }
+        }
     }
 
     $cmp = "docker-compose.yml"

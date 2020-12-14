@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  postgress_11:
+    image: postgres:11
+    container_name: "postgres-11"
+    restart: unless-stopped
+    environment:
+      - "POSTGRES_DB=${NMX_POSTGRES_DB}"
+      - "POSTGRES_USER=${NMX_POSTGRES_USER}"
+      - "POSTGRES_PASSWORD=${NMX_POSTGRES_PASSWORD}"
+    ports: 
+      - "5432:5432"
+    networks:
+      backend:
+        ipv4_address: ${NMX_POSTGRES_IPV4}
+    volumes:
+      - "${NMX_DKR}/data/postgres_11:/var/lib/postgresql/data"
+
+networks:
+  backend:
+    external:
+      name: nmx-backend-vnet

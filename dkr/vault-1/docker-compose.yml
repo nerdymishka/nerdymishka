@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  vault_1:
+    image: vault:latest
+    container_name: vault-1
+    restart: unless-stopped
+    cap_add:
+      - IPC_LOCK
+    ports:
+      - "8200:8200"
+    entrypoint: vault server -config=/vault/config/vault.json
+    volumes:
+      - ${NMX_DKR}/log/vault_1:/vault/logs
+      - ${NMX_DKR}/data/vault_1:/vault/file
+      - ${NMX_DKR}/etc/vault_1:/vault/config 
+    networks:
+      backend:
+        ipv4_address: ${NMX_VAULT_IPV4} 
+
+networks:
+  backend:
+    external:
+      name: nmx-backend-vnet

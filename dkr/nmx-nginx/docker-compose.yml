@@ -7,9 +7,14 @@ services:
     ports:
       - "80:80" # for redirect purposes
       - "443:443"
+      - "6379:6379" 
+      - "1433:1433"
     volumes:
       - ${NMX_DKR}/log/nginx:/var/log/nginx
-      - ${NMX_DKR}/etc/nginx:/etc/nginx
+      - ${NMX_DKR}/etc/nginx/nginx.config:/etc/nginx/nginx.config
+      - ${NMX_DKR}/etc/nginx/includes:/etc/nginx/includes
+      - ${NMX_DKR}/etc/nginx/sites-enabled:/etc/nginx/sites-enabled
+      - ${NMX_DKR}/etc/nginx/streams-enabled:/etc/nginx/streams-enabled
     networks:
       frontend:
         ipv4_address: ${NMX_NGINX_FE_IPV4}

@@ -10,8 +10,8 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ${NMX_DKR}/data/redis:/data
-      - ${NMX_DKR}/etc/redis:/usr/local/etc/redis
+      - ${NMX_DKR}/data/redis_6:/data
+      - ${NMX_DKR}/etc/redis_6:/usr/local/etc/redis
     networks:
       backend:
         ipv4_address: ${NMX_REDIS_IPV4} 

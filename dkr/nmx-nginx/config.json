@@ -6,7 +6,25 @@
     "directories": [
         "etc",
         "etc/nginx",
+        "etc/nginx/includes",
+        "etc/nginx/sites-enabled",
+        "etc/nginx/sites-available",
+        "etc/nginx/streams-enabled",
+        "etc/nginx/streams-available",
         "log",
         "log/nginx"
+    ],
+    "cp": [
+        {
+            "src": "assets/nginx.conf",
+            "dest": "etc/nginx/nginx.conf"
+        },
+        {
+            "src": "assets/includes/*",
+            "dest": "etc/nginx/includes/"
+        }
+    ],
+    "dependsOn": [
+        "network"
     ]
 }

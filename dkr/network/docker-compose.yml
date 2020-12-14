@@ -2,6 +2,7 @@ version: "3.7"
 services: 
   hello_world:
     image: hello-world:latest
+    container_name: "hello_world"
     networks: 
       frontend:
         ipv4_address: ${NMX_FRONTEND_ANCHOR}

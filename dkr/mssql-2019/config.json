@@ -1,0 +1,11 @@
+{
+    "env": {
+        "NMX_MSSQL_PASSWORD": "::password",
+        "NMX_MSSQL_PID": "Express",
+        "NMX_MSSQL_IPV4": "172.6.1.6"
+    },
+    "directories": [
+        "data",
+        "data/mssql_2019"
+    ]
+}

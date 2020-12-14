@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  wordpress-default:
+    image: wordpress:latest
+    restart: unless-stopped
+    environment: 
+      - MYSQL_ROOT_PASSWORD=${NMX_MYSQL_ROOT_PASSWORD}
+      - WORDPRESS_DB_HOST=${NMX_WPDB_DEFAULT_HOST}
+      - WORDPRESS_DB_USER=${NMX_WPDB_DEFAULT_USER}
+      - WORDPRESS_DB_NAME=${NMX_WPDB_DEFAULT_NAME}
+      - WORDPRESS_DB_PASSWORD=${NMX_WPDB_DEFAULT_PASSWORD}
+      - WORDPRESS_TABLE_PREFIX=wp_
+    volumes:

@@ -1,0 +1,12 @@
+{
+    "env": {
+        "NMX_POSTGRES_PASSWORD": "::password",
+        "NMX_POSTGRES_IPV4": "172.6.1.7",
+        "NMX_POSTGRES_USER": "nmx_user",
+        "NMX_POSTGRES_DB": "nmx_default"
+    },
+    "directories": [
+        "data",
+        "data/postgres_11"
+    ]
+}
