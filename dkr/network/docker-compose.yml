@@ -4,18 +4,18 @@ services:
     image: hello-world:latest
     networks: 
       frontend:
-        ipv4_address: 172.5.0.255
+        ipv4_address: ${NMX_FRONTEND_ANCHOR}
       backend:
-        ipv4_address: 172.6.0.255
+        ipv4_address: ${NMX_BACKEND_ANCHOR}
               
 networks:
   frontend: 
-    name: nmx-frontenv-vnet
+    name: nmx-frontend-vnet
     ipam:
       config: 
-       - subnet: 172.5.0.0/16
+       - subnet: ${NMX_FRONTEND_SUBNET}
   backend:
     name: nmx-backend-vnet
     ipam:
       config: 
-       - subnet: 172.6.0.0/16
+       - subnet: ${NMX_BACKEND_SUBNET}
