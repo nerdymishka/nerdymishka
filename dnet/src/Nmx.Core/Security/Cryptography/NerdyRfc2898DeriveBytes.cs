@@ -93,8 +93,7 @@ namespace NerdyMishka.Security.Cryptography
             salt.AsSpan().CopyTo(this.salt);
             this.iterations = (uint)iterations;
 
-            if (password != null)
-                this.password = (byte[])password.Clone();
+            this.password = (byte[])password.Clone();
 
             this.HashAlgorithm = hashAlgorithm;
             this.hmac = this.OpenHmac();
@@ -132,11 +131,13 @@ namespace NerdyMishka.Security.Cryptography
 
         public NerdyRfc2898DeriveBytes(string password, int saltSize, int iterations, HashAlgorithmName hashAlgorithm)
         {
-            if (saltSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(saltSize), $"saleSize must a positive number");
-
-            if (saltSize < MinimumSaltSize)
-                throw new ArgumentException($"salt minimum length is {MinimumSaltSize}", nameof(saltSize));
+            switch (saltSize)
+            {
+                case < 0:
+                    throw new ArgumentOutOfRangeException(nameof(saltSize), $"saleSize must a positive number");
+                case < MinimumSaltSize:
+                    throw new ArgumentException($"salt minimum length is {MinimumSaltSize}", nameof(saltSize));
+            }
 
             if (iterations <= 0)
                 throw new ArgumentOutOfRangeException(nameof(iterations), "iterations must be a positive number");
@@ -162,10 +163,7 @@ namespace NerdyMishka.Security.Cryptography
 
         public int IterationCount
         {
-            get
-            {
-                return (int)this.iterations;
-            }
+            get => (int)this.iterations;
 
             set
             {
@@ -179,10 +177,7 @@ namespace NerdyMishka.Security.Cryptography
 
         public byte[] Salt
         {
-            get
-            {
-                return this.salt.AsSpan(0, this.salt.Length - sizeof(uint)).ToArray();
-            }
+            get => this.salt.AsSpan(0, this.salt.Length - sizeof(uint)).ToArray();
 
             set
             {
@@ -203,10 +198,10 @@ namespace NerdyMishka.Security.Cryptography
 
             if (cb <= 0)
                 throw new ArgumentOutOfRangeException(nameof(cb), "cb must be positive number");
-            byte[] password = new byte[cb];
+            var password = new byte[cb];
 
-            int offset = 0;
-            int size = this.endIndex - this.startIndex;
+            var offset = 0;
+            var size = this.endIndex - this.startIndex;
             if (size > 0)
             {
                 if (cb >= size)
@@ -228,7 +223,7 @@ namespace NerdyMishka.Security.Cryptography
             while (offset < cb)
             {
                 this.Func();
-                int remainder = cb - offset;
+                var remainder = cb - offset;
                 if (remainder >= this.blockSize)
                 {
                     Buffer.BlockCopy(this.buffer, 0, password, offset, this.blockSize);
@@ -333,7 +328,7 @@ namespace NerdyMishka.Security.Cryptography
             if (hashAlgorithm == HashAlgorithmName.SHA512)
                 return new HMACSHA512(this.password);
 
-            throw new CryptographicException($"Unkown Algorithm {hashAlgorithm.Name}");
+            throw new CryptographicException($"Unknown Algorithm {hashAlgorithm.Name}");
         }
 
         private void Initialize()
@@ -392,14 +387,14 @@ namespace NerdyMishka.Security.Cryptography
 
             uiSpan.CopyTo(this.buffer);
 
-            for (int i = 2; i <= this.iterations; i++)
+            for (var i = 2; i <= this.iterations; i++)
             {
                 if (!this.hmac.TryComputeHash(uiSpan, uiSpan, out bytesWritten) || bytesWritten != this.blockSize)
                 {
                     throw new CryptographicException();
                 }
 
-                for (int j = this.buffer.Length - 1; j >= 0; j--)
+                for (var j = this.buffer.Length - 1; j >= 0; j--)
                 {
                     this.buffer[j] ^= uiSpan[j];
                 }
