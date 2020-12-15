@@ -10,12 +10,12 @@ namespace NerdyMishka.Text.DotEnv
 
         private Dictionary<string, string> result = new Dictionary<string, string>();
 
-        private ValueState valueState = ValueState.None;
+        private ValueStates valueState = ValueStates.None;
 
         private string lastWord;
 
         [Flags]
-        public enum ValueState : int
+        public enum ValueStates : int
         {
             /// <summary>
             /// None.
@@ -167,7 +167,7 @@ namespace NerdyMishka.Text.DotEnv
                 token = this.stream.Current;
             }
 
-            this.valueState = ValueState.None;
+            this.valueState = ValueStates.None;
             this.result.Add(this.lastWord, this.stream.GetWord().TrimEnd('\"'));
 
             while (token.Kind != TokenKind.NewLine)
@@ -201,7 +201,7 @@ namespace NerdyMishka.Text.DotEnv
                 token = this.stream.Current;
             }
 
-            this.valueState = ValueState.None;
+            this.valueState = ValueStates.None;
             this.result.Add(this.lastWord, this.stream.GetWord().TrimEnd('\''));
 
             while (token.Kind != TokenKind.NewLine)
@@ -235,7 +235,7 @@ namespace NerdyMishka.Text.DotEnv
                         currentToken = this.stream.Current;
                         if (currentToken.Kind == TokenKind.NewLine)
                         {
-                            this.valueState = ValueState.None;
+                            this.valueState = ValueStates.None;
                             return ParserState.None;
                         }
                     }
@@ -253,11 +253,11 @@ namespace NerdyMishka.Text.DotEnv
         {
             switch (this.valueState)
             {
-                case ValueState.DoubleQuote:
+                case ValueStates.DoubleQuote:
                     return this.VisitDoubleQuote(token);
-                case ValueState.SingleQuote:
+                case ValueStates.SingleQuote:
                     return this.VisitSingleQuote(token);
-                case ValueState.Json:
+                case ValueStates.Json:
                     return this.VisitJson();
                 default:
                     throw new NotSupportedException($"unsupported value state {this.valueState}");
@@ -266,7 +266,7 @@ namespace NerdyMishka.Text.DotEnv
 
         private ParserState VisitValue(Token token)
         {
-            if (this.stream.WordLength == 0 && this.valueState.HasFlag(ValueState.None))
+            if (this.stream.WordLength == 0 && this.valueState.HasFlag(ValueStates.None))
             {
                 switch (token.Kind)
                 {
@@ -276,13 +276,13 @@ namespace NerdyMishka.Text.DotEnv
                     case TokenKind.WhiteSpace:
                         return ParserState.Value;
                     case TokenKind.DoubleQuote:
-                        this.valueState = ValueState.DoubleQuote;
+                        this.valueState = ValueStates.DoubleQuote;
                         if (!this.stream.MoveNext())
                             return ParserState.End;
                         token = this.stream.Current;
                         break;
                     case TokenKind.SingleQuote:
-                        this.valueState = ValueState.SingleQuote;
+                        this.valueState = ValueStates.SingleQuote;
                         if (!this.stream.MoveNext())
                             return ParserState.End;
                         token = this.stream.Current;
@@ -292,7 +292,7 @@ namespace NerdyMishka.Text.DotEnv
                 }
             }
 
-            if (this.valueState != ValueState.None)
+            if (this.valueState != ValueStates.None)
             {
                 if (token.Kind == TokenKind.NewLine)
                 {
@@ -302,9 +302,9 @@ namespace NerdyMishka.Text.DotEnv
 
                 switch (this.valueState)
                 {
-                    case ValueState.DoubleQuote:
+                    case ValueStates.DoubleQuote:
                         return this.VisitDoubleQuoteLine(token);
-                    case ValueState.SingleQuote:
+                    case ValueStates.SingleQuote:
                         return this.VisitSingleQuoteLine(token);
                 }
             }
