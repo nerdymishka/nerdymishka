@@ -2,22 +2,22 @@ using System;
 
 namespace NerdyMishka.Security.Cryptography
 {
-    public struct HashAlgorithmName : IEquatable<NerdyMishka.Security.Cryptography.HashAlgorithmName>
+    public readonly struct HashAlgorithmName : IEquatable<NerdyMishka.Security.Cryptography.HashAlgorithmName>
     {
         private HashAlgorithmName(string name)
         {
             this.Name = name;
         }
 
-        public static HashAlgorithmName MD5 { get; private set; } = new HashAlgorithmName("MD5");
+        public static HashAlgorithmName MD5 { get;} = new HashAlgorithmName("MD5");
 
-        public static HashAlgorithmName SHA1 { get; private set; } = new HashAlgorithmName("SHA1");
+        public static HashAlgorithmName SHA1 { get; } = new HashAlgorithmName("SHA1");
 
-        public static HashAlgorithmName SHA256 { get; private set; } = new HashAlgorithmName("SHA256");
+        public static HashAlgorithmName SHA256 { get; } = new HashAlgorithmName("SHA256");
 
-        public static HashAlgorithmName SHA384 { get; private set; } = new HashAlgorithmName("SHA384");
+        public static HashAlgorithmName SHA384 { get; } = new HashAlgorithmName("SHA384");
 
-        public static HashAlgorithmName SHA512 { get; private set; } = new HashAlgorithmName("SHA512");
+        public static HashAlgorithmName SHA512 { get; } = new HashAlgorithmName("SHA512");
 
         public string Name { get; }
 

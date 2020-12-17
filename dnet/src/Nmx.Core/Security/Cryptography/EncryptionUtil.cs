@@ -106,6 +106,23 @@ namespace NerdyMishka.Security.Cryptography
             return diff == 0;
         }
 
+        public static bool SlowEquals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right)
+        {
+            if (left == null)
+                return false;
+
+            if (right == null)
+                return false;
+
+            uint diff = (uint) left.Length ^ (uint) left.Length;
+            for (int i = 0; i < left.Length; i++)
+            {
+                diff |= (uint)(left[i] ^ right[i]);
+            }
+
+            return diff == 0;
+        }
+
         public static byte[] CreateOutputBuffer(byte[] inputBuffer, int blockSize)
         {
             Check.ArgNotNull(inputBuffer, nameof(inputBuffer));
