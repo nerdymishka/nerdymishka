@@ -10,10 +10,33 @@ namespace NerdyMishka.Diagnostics
 {
     public static class Shell
     {
+        public static ShellCaptureResult Execute(string command)
+        {
+            Check.ArgNotWhiteSpace(command, nameof(command));
+
+            if (command.Contains(' '))
+            {
+                var firstSpaceIndex = command.IndexOf(' ');
+                var fileName = command.Substring(0, firstSpaceIndex);
+                var args = command.Substring(firstSpaceIndex + 1);
+
+                return Execute(fileName, args);
+            }
+
+            return Execute(command, (string)null);
+        }
+
         public static ShellCaptureResult Execute(
             string fileName,
-            string arguments = null,
-            string workingDirectory = null,
+            string arguments)
+        {
+            return Execute(fileName, arguments, (string)null, null);
+        }
+
+        public static ShellCaptureResult Execute(
+            string fileName,
+            string arguments,
+            string workingDirectory,
             int? timeout = null)
         {
             var info = new ProcessStartInfo(fileName);
@@ -151,6 +174,8 @@ namespace NerdyMishka.Diagnostics
 
             if (info.RedirectStandardError && errorHandler != null)
                 process.ErrorDataReceived += errorHandler;
+
+            process.Start();
 
             if (redirect)
             {

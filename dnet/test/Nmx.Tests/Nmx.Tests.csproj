@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mettle\Mettle.csproj" />
+    <ProjectReference Include="..\..\src\Nmx.Core\Nmx.Core.csproj" />
   </ItemGroup>
 
 </Project>
