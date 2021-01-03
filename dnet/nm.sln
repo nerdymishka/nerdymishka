@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmx.Flex", "src\Nmx.Flex\Nm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmx.Templates", "src\Nmx.Templates\Nmx.Templates.csproj", "{CA1D2A27-2DA1-445C-8623-562B198337CA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nmx.CommandLine.Hosting", "src\Nmx.CommandLine.Hosting\Nmx.CommandLine.Hosting.csproj", "{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -204,6 +206,18 @@ Global
 		{CA1D2A27-2DA1-445C-8623-562B198337CA}.Release|x64.Build.0 = Release|Any CPU
 		{CA1D2A27-2DA1-445C-8623-562B198337CA}.Release|x86.ActiveCfg = Release|Any CPU
 		{CA1D2A27-2DA1-445C-8623-562B198337CA}.Release|x86.Build.0 = Release|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Debug|x64.Build.0 = Debug|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Debug|x86.Build.0 = Debug|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Release|x64.ActiveCfg = Release|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Release|x64.Build.0 = Release|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Release|x86.ActiveCfg = Release|Any CPU
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -222,6 +236,7 @@ Global
 		{E50843C6-C65D-47AF-ACE7-FAA03CCE3CC5} = {00513692-D2A6-4CC3-962F-56A22DB0D017}
 		{63A1A291-1253-4B8C-A346-DB1E5463069D} = {00513692-D2A6-4CC3-962F-56A22DB0D017}
 		{CA1D2A27-2DA1-445C-8623-562B198337CA} = {00513692-D2A6-4CC3-962F-56A22DB0D017}
+		{687C73A5-658B-44FA-BB8D-1D70A3A88BA6} = {00513692-D2A6-4CC3-962F-56A22DB0D017}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {52775593-0623-448C-9F8F-EC04EAAC8B00}
