@@ -17,6 +17,5 @@ namespace NerdyMishka.Diagnostics
         public DateTimeOffset? StartedAt { get; init; }
 
         public TimeSpan Duration { get; init; }
-
     }
 }

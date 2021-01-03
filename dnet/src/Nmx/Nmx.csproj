@@ -6,7 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20574.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nmx.Core\Nmx.Core.csproj" />
+    <ProjectReference Include="..\Nmx.DotEnv\Nmx.DotEnv.csproj" />
+    <ProjectReference Include="..\Nmx.Shell.Commands\Nmx.Shell.Commands.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Beta\Job\" />
   </ItemGroup>
 
 </Project>
