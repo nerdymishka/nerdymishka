@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mettle\Mettle.csproj" />
     <ProjectReference Include="..\..\src\Nmx.Core\Nmx.Core.csproj" />
+    <ProjectReference Include="..\..\src\Nmx.Shell.Commands\Nmx.Shell.Commands.csproj" />
   </ItemGroup>
 
 </Project>
